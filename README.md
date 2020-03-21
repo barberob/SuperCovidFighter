@@ -1,2 +1,2 @@
 # SuperCovidFighter
- un jeu qui au succès viral
+ Un jeu au succès viral
