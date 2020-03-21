@@ -1,4 +1,4 @@
-class Bomb
+class Corona
 {
   int x,y,r;
   int xSpeed,ySpeed;
@@ -6,7 +6,7 @@ class Bomb
   int db;
   
   
-   Bomb(int newX, int newY, int newRayon, color newCouleur)
+   Corona(int newX, int newY, int newRayon, color newCouleur)
   {
     x = newX;
     y = newY;

@@ -1,4 +1,4 @@
-class Balle 
+class Globule
 {
   int x,y,r;
   int xvalue,yvalue;
@@ -9,7 +9,7 @@ class Balle
   
   
   
-  Balle (int newX, int newY, int newRayon, color newCouleur)
+  Globule (int newX, int newY, int newRayon, color newCouleur)
   {
     x = newX;
     y = newY;
@@ -46,7 +46,7 @@ class Balle
   }
   
   
-  boolean intersect(Bomb b) 
+  boolean intersect(Corona b) 
   {
       float distance = dist(x, y, b.x, b.y);
   

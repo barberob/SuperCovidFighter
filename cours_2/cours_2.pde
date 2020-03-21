@@ -10,7 +10,7 @@ int buttonValue;
 int background =0;
 int dB = 20; 
 boolean hasTouched =false;
-Bomb[] bombs;
+Corona[] coronas;
 int last = 0;
 int m = 0;
 int numOfBombs=1;
@@ -23,7 +23,7 @@ int timeOfGame = 0;
 //Minim minim;
 //AudioPlayer musiqueFond;
 
-Balle maBalle = new Balle ( 250, 250, 15, color(255));
+Globule myGlobule = new Globule ( 250, 250, 15, color(255));
 
 
 void setup() 
@@ -99,21 +99,21 @@ void keyPressed()
 {
   if (key == CODED ) 
   {
-     if(keyCode == UP) if (maBalle.yvalue>-5) 
+     if(keyCode == UP) if (myGlobule.yvalue>-5) 
      {
-       maBalle.yvalue -= 2; 
+       myGlobule.yvalue -= 2; 
      }
-     if(keyCode == LEFT) if (maBalle.xvalue>-5) 
+     if(keyCode == LEFT) if (myGlobule.xvalue>-5) 
      {
-       maBalle.xvalue -= 2;
+       myGlobule.xvalue -= 2;
      }
-     if(keyCode == RIGHT) if(maBalle.xvalue<5)
+     if(keyCode == RIGHT) if(myGlobule.xvalue<5)
      {
-       maBalle.xvalue += 2;
+       myGlobule.xvalue += 2;
      }
-     if(keyCode == DOWN) if(maBalle.yvalue<5)
+     if(keyCode == DOWN) if(myGlobule.yvalue<5)
      {
-       maBalle.yvalue += 2;  
+       myGlobule.yvalue += 2;  
      }
   }
 }
@@ -144,7 +144,7 @@ void mousePressed() {
 
 void initBombs(){
   
-    bombs = new Bomb[30];
+    coronas = new Corona[30];
     for (int i=0 ; i<30 ; i++)
     {
        int x = int(random(0,800)); 
@@ -163,7 +163,7 @@ void initBombs(){
          y = 799 - size;
        }
        
-        bombs[i] = new Bomb( x, y, size, color(255, 0, 0));
+        coronas[i] = new Corona( x, y, size, color(255, 0, 0));
     } 
 }
 
@@ -176,9 +176,9 @@ void moveBombs()
     
     for (int i =0 ; i<numOfBombs ; i++)
     {
-        bombs[i].move();
-        bombs[i].testOOB();
-        bombs[i].display();
+        coronas[i].move();
+        coronas[i].testOOB();
+        coronas[i].display();
     } 
 }
 
@@ -191,9 +191,9 @@ void play() {
   background(background);
   image(fond,0,0);
   
-  maBalle.move();
-  maBalle.testOOB();
-  maBalle.display();
+  myGlobule.move();
+  myGlobule.testOOB();
+  myGlobule.display();
 
   moveBombs();
        
@@ -246,7 +246,7 @@ boolean testCollisionBombs()
    intersecting = false;
    for (int i=0 ; i<numOfBombs ; i++)
    {
-        if(maBalle.intersect(bombs[i]))
+        if(myGlobule.intersect(coronas[i]))
         {
             intersecting = true;
             break;
