@@ -65,16 +65,16 @@ void draw()
 
 
 
-//void serialEvent(Serial port) 
-//{
-//    String serialStr = port.readStringUntil('\n');
-//    serialStr = trim(serialStr);
-//    int values[] = int(split(serialStr, ','));
-//    if( values.length == 4 ) 
-//    {
+void serialEvent(Serial port) 
+{
+    String serialStr = port.readStringUntil('\n');
+    serialStr = trim(serialStr);
+    int values[] = int(split(serialStr, ','));
+    if( values.length == 4 ) 
+    {
           
-//    }
-//}
+    }
+}
 
 //float calculate( int returnValue, int baseValue ) 
 //{
@@ -84,11 +84,11 @@ void draw()
 //}
 
 
-//int calculate (int baseValue, int returnValue )
-//{
-//  int dif = returnValue - baseValue;
-//  return round(dif/5);
-//}
+int calculate (int baseValue, int returnValue )
+{
+  int dif = returnValue - baseValue;
+  return round(dif/5);
+}
 
 
 
