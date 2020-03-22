@@ -1,7 +1,7 @@
 import processing.serial.*;
 //import ddf.minim.*;
 
-Serial port;
+Serial myPort;
 PImage fond,ball;
 float xvalue = 0;
 float yvalue = 0;
@@ -17,6 +17,8 @@ int numOfBombs=1;
 int time;
 boolean intersecting;
 boolean hasLoosed = false;
+boolean canAttack = true;
+boolean isAttacking = false;
 PFont f;
 int timeOfGame = 0;
 
@@ -24,6 +26,7 @@ int timeOfGame = 0;
 //AudioPlayer musiqueFond;
 
 Globule myGlobule = new Globule ( 250, 250, 15, color(255));
+Attack myAttack = new Attack(250, 250, 75, color(0));
 
 
 void setup() 
@@ -35,8 +38,8 @@ void setup()
     textFont(f);
     smooth();
     size(800, 800);
-    //port = new Serial(this, "COM5", 9600);
-    //port.bufferUntil('\n');
+    myPort = new Serial(this, "COM5", 9600);
+    myPort.bufferUntil('\n');
     background(background);
     fond = loadImage("data/trump.jpg");
     fond.resize(800,800);
@@ -65,14 +68,30 @@ void draw()
 
 
 
-void serialEvent(Serial port) 
+void serialEvent(Serial myPort) 
 {
-    String serialStr = port.readStringUntil('\n');
+    println("swag");
+    String serialStr = myPort.readStringUntil('\n');
     serialStr = trim(serialStr);
     int values[] = int(split(serialStr, ','));
-    if( values.length == 4 ) 
+    if( values.length == 3 ) 
     {
-          
+      if(values[2]==1)
+      {
+        isAttacking  = true;
+      }
+      else
+      {
+        isAttacking = false;
+      }
+      
+      int newX = int(map(values[0],-509,514,-5,5));
+      int newY = int(map(values[1],-507,516,-5,5));
+      myAttack.x = myGlobule.x;
+      myAttack.y = myGlobule.y;
+      myGlobule.x += newX;
+      myGlobule.y += newY;
+      
     }
 }
 
@@ -93,7 +112,7 @@ int calculate (int baseValue, int returnValue )
 
 
 
-//_______________________________________________________________________________________________KEY EVENTS____________________________________________________________________________________________________________//
+//_______________________________________________________________________________________________EVENTS____________________________________________________________________________________________________________//
 
 void keyPressed()
 {
@@ -123,21 +142,8 @@ void mousePressed() {
   {
     hasLoosed = false;
     numOfBombs = 1;
-    println("ooooooke");
   } 
 }
-
-//void keyReleased()
-//{
-//  if (key == CODED ) {
-//   if(keyCode == UP) maBalle.y = 0;
-//   if(keyCode == LEFT) maBalle.x = 0;
-//   if(keyCode == RIGHT) maBalle.x = 0;
-//   if(keyCode == DOWN) maBalle.y = 0;
-//  }
-    
-//}
-
 
 //_______________________________________________________________________________________________FUNCTIONS____________________________________________________________________________________________________________//
 
@@ -145,8 +151,10 @@ void mousePressed() {
 void initBombs(){
   
     coronas = new Corona[30];
+  
     for (int i=0 ; i<30 ; i++)
     {
+    
        int x = int(random(0,800)); 
        int y = int(random(0,800)); 
        int size = int(random(15,50));
@@ -176,9 +184,18 @@ void moveBombs()
     
     for (int i =0 ; i<numOfBombs ; i++)
     {
-        coronas[i].move();
-        coronas[i].testOOB();
-        coronas[i].display();
+        if(coronas[i].isDead == false){
+        
+          coronas[i].move();
+          coronas[i].testOOB();
+          coronas[i].display();
+        }
+        else
+        {
+          coronas[i].x = 1600;
+          coronas[i].y = 1600;
+          
+        }
     } 
 }
 
@@ -191,7 +208,16 @@ void play() {
   background(background);
   image(fond,0,0);
   
-  myGlobule.move();
+  
+  
+  //myGlobule.move();
+  
+  if(isAttacking == true ) 
+  {
+    testDestroyBombs();
+    myAttack.display();
+  }
+  
   myGlobule.testOOB();
   myGlobule.display();
 
@@ -269,3 +295,15 @@ boolean testCollisionBombs()
 }
 
 //////////////////////////////////////////////
+void testDestroyBombs()
+{
+   for (int i=0 ; i<numOfBombs ; i++)
+   {
+      if(myAttack.intersect(coronas[i]))
+      {
+          coronas[i].isDead =true;
+          coronas[i].r = 0;
+          break;
+      } 
+   }    
+}

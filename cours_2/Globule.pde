@@ -18,14 +18,14 @@ class Globule
     
   }
   
-  void move()
- {
-  //  x= x + xvalue;
-  //  y = y + yvalue;
-    x = mouseX;
-    y = mouseY;
+ // void move()
+ //{
+ // //  x= x + xvalue;
+ // //  y = y + yvalue;
+ //   x = mouseX;
+ //   y = mouseY;
     
-  } 
+ // } 
   
   
   void display() 
