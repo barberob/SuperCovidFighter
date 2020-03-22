@@ -5,15 +5,15 @@ Serial port;
 PImage fond,ball;
 float xvalue = 0;
 float yvalue = 0;
-int AngleVision=90;
+int AngleVision = 90;
 int buttonValue;
-int background =0;
+int background = 0;
 int dB = 20; 
-boolean hasTouched =false;
+boolean hasTouched = false;
 Corona[] coronas;
 int last = 0;
 int m = 0;
-int numOfBombs=1;
+int numOfBombs = 1;
 int time;
 boolean intersecting;
 boolean hasLoosed = false;
@@ -97,30 +97,24 @@ void draw()
 
 void keyPressed()
 {
-  if (key == CODED ) 
-  {
-     if(keyCode == UP) if (myGlobule.yvalue>-5) 
-     {
+  if (key == CODED ) {
+     if(keyCode == UP) if (myGlobule.yvalue>-5) {
        myGlobule.yvalue -= 2; 
      }
-     if(keyCode == LEFT) if (myGlobule.xvalue>-5) 
-     {
+     if(keyCode == LEFT) if (myGlobule.xvalue>-5) {
        myGlobule.xvalue -= 2;
      }
-     if(keyCode == RIGHT) if(myGlobule.xvalue<5)
-     {
+     if(keyCode == RIGHT) if(myGlobule.xvalue<5) {
        myGlobule.xvalue += 2;
      }
-     if(keyCode == DOWN) if(myGlobule.yvalue<5)
-     {
+     if(keyCode == DOWN) if(myGlobule.yvalue<5) {
        myGlobule.yvalue += 2;  
      }
   }
 }
 
 void mousePressed() {
-  if (hasLoosed == true) 
-  {
+  if (hasLoosed == true) {
     hasLoosed = false;
     numOfBombs = 1;
     println("ooooooke");
@@ -145,21 +139,21 @@ void mousePressed() {
 void initBombs(){
   
     coronas = new Corona[30];
-    for (int i=0 ; i<30 ; i++)
-    {
+    for (int i=0 ; i<30 ; i++) {
+      
        int x = int(random(0,800)); 
        int y = int(random(0,800)); 
        int size = int(random(15,50));
        
-       if(x <= 400) {
+       if (x <= 400) {
          x = 1 + size;
-       }else{
+       } else {
          x = 799 - size;
        }
        
-       if(y <= 400) {
+       if (y <= 400) {
          y = 1 + size;
-       }else{
+       } else {
          y = 799 - size;
        }
        
@@ -174,8 +168,7 @@ void initBombs(){
 void moveBombs()
 {
     
-    for (int i =0 ; i<numOfBombs ; i++)
-    {
+    for (int i =0 ; i<numOfBombs ; i++) {
         coronas[i].move();
         coronas[i].testOOB();
         coronas[i].display();
@@ -197,17 +190,14 @@ void play() {
 
   moveBombs();
        
-  if (testCollisionBombs())
-  {
+  if (testCollisionBombs()) {
     hasLoosed = true;
   }
   
-  m = millis()-last;
-  if(millis() > last+5000)
-  {
+  m = millis() - last;
+  if (millis() > last+5000) {
       last = millis();
-      if (numOfBombs < 30) 
-      {
+      if (numOfBombs < 30) {
         numOfBombs++;
       }
       
@@ -227,12 +217,11 @@ void looseScreen() {
   textAlign(CENTER,CENTER);
   
   
-  if(time<60){ 
+  if (time<60) { 
    text("Tu as tenu "+time +" secondes, quel Mickey...",400,400);
-  }else if (time < 120){
+  } else if (time < 120) {
      text("Tu as tenu "+time +" secondes, pas mal pour une baltringue...",400,400);
-  }
-  else{
+  } else {
      text("Tu as tenu "+time +" secondes, c'est un peu ridicule quand même...",400,400);
   }
   
@@ -241,28 +230,20 @@ void looseScreen() {
 
 /////////////////////////////////////////////
 
-boolean testCollisionBombs()
-{
+boolean testCollisionBombs() {
    intersecting = false;
-   for (int i=0 ; i<numOfBombs ; i++)
-   {
-        if(myGlobule.intersect(coronas[i]))
-        {
+   for (int i=0 ; i<numOfBombs ; i++) {
+        if(myGlobule.intersect(coronas[i])) {
             intersecting = true;
             break;
-        }
-        else
-        {
+        } else {
             intersecting = false;
         }
    }   
 
-    if(intersecting == true)
-    {
+    if(intersecting == true) {
         return true;
-    }
-    else 
-    {
+    } else {
         return false;
     }
     

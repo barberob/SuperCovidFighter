@@ -1,17 +1,17 @@
 class Corona
 {
-  int x,y,r;
-  int xSpeed,ySpeed;
-  color couleur;
+  int x, y, r;
+  int xSpeed, ySpeed;
+  color ccolor;
   int db;
   
   
-   Corona(int newX, int newY, int newRayon, color newCouleur)
+   Corona(int newX, int newY, int newRadius, color newColor)
   {
     x = newX;
     y = newY;
-    r = newRayon;
-    couleur = newCouleur;
+    r = newRadius;
+    ccolor = newColor;
     xSpeed = int(random(0,10));
     ySpeed = int(random(0,10));
     
@@ -26,7 +26,7 @@ class Corona
   
   void display() 
   {
-    fill(couleur);
+    fill(ccolor);
     ellipse(x,y,r,r);
   }
   

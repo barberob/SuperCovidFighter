@@ -1,20 +1,20 @@
 class Globule
 {
-  int x,y,r;
-  int xvalue,yvalue;
-  color couleur;
-  int db =20;
+  int x, y, r;
+  int xvalue, yvalue;
+  color gcolor;
+  int db = 20;
   int vitesse = 5; 
   boolean hasTouchedSomething = false;
   
   
   
-  Globule (int newX, int newY, int newRayon, color newCouleur)
+  Globule (int newX, int newY, int newRadius, color newColor)
   {
     x = newX;
     y = newY;
-    r = newRayon;
-    couleur = newCouleur;
+    r = newRadius;
+    gcolor = newColor;
     
   }
   
@@ -30,7 +30,7 @@ class Globule
   
   void display() 
   {
-    fill(couleur);
+    fill(gcolor);
     ellipse(x,y,db,db);
   }
   
