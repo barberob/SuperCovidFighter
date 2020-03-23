@@ -12,21 +12,28 @@ int dB = 20;
 boolean hasTouched =false;
 Corona[] coronas;
 int last = 0;
+int lastAttack =0;
 int m = 0;
-int numOfBombs=1;
+int numOfBombs=0;
 int time;
+
+
 boolean intersecting;
 boolean hasLoosed = false;
 boolean canAttack = true;
 boolean isAttacking = false;
+int attackDuration = 500; //ms
+int attackCooldown = 3000; //ms
+
+
 PFont f;
 int timeOfGame = 0;
 
 //Minim minim;
 //AudioPlayer musiqueFond;
 
-Globule myGlobule = new Globule ( 250, 250, 15, color(255));
-Attack myAttack = new Attack(250, 250, 75, color(0));
+Globule myGlobule = new Globule ( 250, 250, 10, color(255));
+Attack myAttack = new Attack(250, 250, color(0));
 
 
 void setup() 
@@ -70,7 +77,6 @@ void draw()
 
 void serialEvent(Serial myPort) 
 {
-    println("swag");
     String serialStr = myPort.readStringUntil('\n');
     serialStr = trim(serialStr);
     int values[] = int(split(serialStr, ','));
@@ -157,7 +163,7 @@ void initBombs(){
     
        int x = int(random(0,800)); 
        int y = int(random(0,800)); 
-       int size = int(random(15,50));
+       int size = int(random(5,25));
        
        if(x <= 400) {
          x = 1 + size;
@@ -212,8 +218,9 @@ void play() {
   
   //myGlobule.move();
   
-  if(isAttacking == true ) 
+  if(isAttacking == true && canAttack == true) 
   {
+    
     testDestroyBombs();
     myAttack.display();
   }
@@ -228,7 +235,7 @@ void play() {
     hasLoosed = true;
   }
   
-  m = millis()-last;
+  //m = millis()-last;
   if(millis() > last+5000)
   {
       last = millis();
@@ -237,6 +244,17 @@ void play() {
         numOfBombs++;
       }
       
+  }
+  if(millis() > lastAttack + attackCooldown)
+  {
+      lastAttack = millis();
+      canAttack =true; 
+  }
+  
+  if( isAttacking == true  &&  millis() > lastAttack + attackDuration)
+  {
+      lastAttack = millis();
+      canAttack =false; 
   }
   
   text(time + "s" ,50,50);
@@ -303,6 +321,7 @@ void testDestroyBombs()
       {
           coronas[i].isDead =true;
           coronas[i].r = 0;
+          canAttack = false;
           break;
       } 
    }    

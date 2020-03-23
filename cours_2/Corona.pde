@@ -12,6 +12,7 @@ class Corona
     x = newX;
     y = newY;
     r = newRayon;
+    db = r*2;
     couleur = newCouleur;
     xSpeed = int(random(0,5));
     ySpeed = int(random(0,5));
@@ -29,7 +30,7 @@ class Corona
   {
     fill(couleur);
     ellipseMode(CENTER);
-    ellipse(x,y,r,r);
+    ellipse(x,y,db,db);
   }
   
   void testOOB()

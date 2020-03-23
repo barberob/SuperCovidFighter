@@ -1,17 +1,17 @@
 class Attack
 {
-    int x,y,r;
+    int x,y,r,db;
     int xvalue,yvalue;
     color couleur;
-    int db =20;
     boolean hasTouchedSomething = false;
-    //int maxRange = 75;
+    int maxRange = 100;
   
-    Attack (int newX, int newY, int newRayon, color newCouleur)
+    Attack (int newX, int newY, color newCouleur)
     {
       x = newX;
       y = newY;
-      r = newRayon;
+      db = maxRange;
+      r = db/2;
       couleur = newCouleur;
       
     }
@@ -20,7 +20,7 @@ class Attack
     {
       fill(couleur);
       ellipseMode(CENTER);
-      ellipse(x,y,75,75);
+      ellipse(x,y,db,db);
      
     }
     

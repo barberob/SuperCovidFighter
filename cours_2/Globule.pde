@@ -1,9 +1,10 @@
 class Globule
 {
-  int x,y,r;
+  int x,y;
   int xvalue,yvalue;
   color couleur;
   int db =20;
+  int r =db/2;
   int vitesse = 5; 
   boolean hasTouchedSomething = false;
   
@@ -14,6 +15,7 @@ class Globule
     x = newX;
     y = newY;
     r = newRayon;
+    db = r*2;
     couleur = newCouleur;
     
   }
@@ -36,12 +38,19 @@ class Globule
   
   void testOOB()
   {
-     if (x > (width - db /2 ) || x < 0) {
-       x = x - xvalue; 
+     if (x > (width - r )) {
+       x = x - r ;
      }
      
-     if (y > ( height - db /2 ) || y < 0) {
-       y = y - yvalue; 
+     if (y > ( height - r )) {
+       y =  y - r;
+     }
+     if (x < r) {
+       x = x + r ;
+     }
+     
+     if (y < r){
+       y =  y + r;
      }
   }
   
