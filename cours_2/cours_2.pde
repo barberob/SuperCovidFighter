@@ -49,7 +49,7 @@ void setup()
 void draw() 
 {
     
-    if (hasLoosed == false) 
+    if (hasLost == false) 
     {
         play();
     }
