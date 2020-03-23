@@ -14,6 +14,7 @@ Corona[] coronas;
 Virus[] viruses;
 int last = 0;
 int m = 0;
+int n = 1;
 int numOfCoronas = 1;
 int numOfViruses = 1;
 int time;
@@ -21,6 +22,7 @@ boolean intersecting;
 boolean hasLost = false;
 PFont f;
 int timeOfGame = 0;
+int direction;
 
 //Minim minim;
 //AudioPlayer musiqueFond;
@@ -160,7 +162,7 @@ void initCoronas(){
 
 void moveCoronas()
 {   
-    for (int i =0 ; i<numOfCoronas ; i++) {
+    for (int i =0 ; i < numOfCoronas ; i++) {
         coronas[i].move();
         coronas[i].testOOB();
         coronas[i].display();
@@ -173,13 +175,23 @@ void moveCoronas()
 void initViruses() {
   viruses = new Virus[10];
   
-  int xlocate = int(random(0, 800));
+  int rightOrLeftSpawnPoint = int(random(1, 2));
   
-  for (int i = 0 ; i < 50 ; i++) {
+  int xlocate;
+  
+  if (rightOrLeftSpawnPoint == 1) {
+    xlocate = int(random(0, 100));
+    direction = 1;
+  } else {
+    xlocate = int(random(700, 800));
+    direction = -1;
+  }
+  
+  for (int i = 0 ; i < 10 ; i++) {
     
-     int x = int(random(xlocate, xlocate + 300)); 
-     int y = int(random(0, 10)); 
-     int size = int(random(15, 50));
+     int x = int(random(xlocate, xlocate + (300 * direction))); 
+     int y = int(10 * i + random(0, 10)); 
+     int size = int(random(15, 20));
      
      if (x <= 400) {
        x = 1 + size;
@@ -192,6 +204,7 @@ void initViruses() {
      } else {
        y = 799 - size;
      }
+
      
     viruses[i] = new Virus(x, y, 50, color(0, 255, 255));
   } 
@@ -201,11 +214,14 @@ void initViruses() {
 /////////////////////////////////////////////
 
 void moveViruses() {
-  for (int i = 0 ; i < numOfViruses ; i++) {
-    viruses[i].move();
-    //viruses[i].testOOB();
-    viruses[i].display();
-  } 
+  
+  if (numOfViruses > 5 * n) {  
+    for (int i = 0 ; i < numOfViruses ; i++) {
+      viruses[i].move(direction);
+      //viruses[i].testOOB();
+      viruses[i].display();
+    } 
+  }
 }
 
 /////////////////////////////////////////////
@@ -232,6 +248,7 @@ void play() {
       last = millis();
       if (numOfCoronas < 30) {
         numOfCoronas++;
+        numOfViruses++;
       }
       
   }

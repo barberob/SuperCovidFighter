@@ -10,8 +10,8 @@ class Virus {
     vcolor = newColor;
   }
   
-  void move() {
-    x = x + 2;
+  void move(int direction) {
+    x = x + direction;
   }
   
   void display() {
