@@ -209,7 +209,7 @@ void moveBombs()
 /////////////////////////////////////////////
 
 void play() {
- time = millis()/1000 - timeOfGame;
+  time = millis()/1000 - timeOfGame;
     
   background(background);
   image(fond,0,0);
@@ -251,10 +251,15 @@ void play() {
       canAttack =true; 
   }
   
-  if( isAttacking == true  &&  millis() > lastAttack + attackDuration)
+  //if( isAttacking == true  &&  millis() > lastAttack + attackDuration)
+  //{
+  //    lastAttack = millis();
+  //    canAttack =false; 
+  //}
+  
+  if (isAttacking == true) 
   {
-      lastAttack = millis();
-      canAttack =false; 
+      
   }
   
   text(time + "s" ,50,50);
