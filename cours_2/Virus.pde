@@ -16,7 +16,7 @@ class Virus {
   
   void display() {
     fill(vcolor);
-    ellipse(x,y,r,r);
+    ellipse(x,y, r, r);
   }
   
 }

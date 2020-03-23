@@ -2,7 +2,7 @@ import processing.serial.*;
 //import ddf.minim.*;
 
 Serial port;
-PImage fond,ball;
+PImage fond, ball;
 float xvalue = 0;
 float yvalue = 0;
 int AngleVision = 90;
@@ -49,13 +49,9 @@ void setup()
 void draw() 
 {
     
-    if (hasLost == false) 
-    {
+    if (hasLost == false) {
         play();
-    }
-    
-    else
-    {
+    } else {
        loseScreen();
     }
 }
@@ -66,13 +62,11 @@ void draw()
 
 
 
-void serialEvent(Serial port) 
-{
+void serialEvent(Serial port) {
     String serialStr = port.readStringUntil('\n');
     serialStr = trim(serialStr);
     int values[] = int(split(serialStr, ','));
-    if( values.length == 4 ) 
-    {
+    if( values.length == 4 ) {
           
     }
 }
@@ -85,8 +79,7 @@ void serialEvent(Serial port)
 //}
 
 
-int calculate (int baseValue, int returnValue )
-{
+int calculate (int baseValue, int returnValue ) {
   int dif = returnValue - baseValue;
   return round(dif/5);
 }
@@ -96,8 +89,7 @@ int calculate (int baseValue, int returnValue )
 
 //_______________________________________________________________________________________________KEY EVENTS____________________________________________________________________________________________________________//
 
-void keyPressed()
-{
+void keyPressed() {
   if (key == CODED ) {
      if(keyCode == UP) if (myGlobule.yvalue>-5) {
        myGlobule.yvalue -= 2; 
@@ -140,11 +132,11 @@ void mousePressed() {
 void initCoronas(){
   
     coronas = new Corona[30];
-    for (int i=0 ; i<30 ; i++) {
+    for (int i=0 ; i < 30 ; i++) {
       
-       int x = int(random(0,800)); 
-       int y = int(random(0,800)); 
-       int size = int(random(7,25));
+       int x = int(random(0, 800)); 
+       int y = int(random(0, 800)); 
+       int size = int(random(7, 25));
        
        if (x <= 400) {
          x = 1 + size;
@@ -179,12 +171,14 @@ void moveCoronas()
 /////////////////////////////////////////////
 
 void initViruses() {
-  viruses = new Virus[50];
+  viruses = new Virus[10];
+  
+  int xlocate = int(random(0, 800));
   
   for (int i = 0 ; i < 50 ; i++) {
     
-     int x = int(random(0, 800)); 
-     int y = int(random(0, 800)); 
+     int x = int(random(xlocate, xlocate + 300)); 
+     int y = int(random(0, 10)); 
      int size = int(random(15, 50));
      
      if (x <= 400) {
@@ -208,9 +202,9 @@ void initViruses() {
 
 void moveViruses() {
   for (int i = 0 ; i < numOfViruses ; i++) {
-      viruses[i].move();
-      //viruses[i].testOOB();
-      viruses[i].display();
+    viruses[i].move();
+    //viruses[i].testOOB();
+    viruses[i].display();
   } 
 }
 
@@ -220,7 +214,7 @@ void play() {
   time = millis()/1000 - timeOfGame;
     
   background(background);
-  image(fond,0,0);
+  image(fond, 0, 0);
   
   myGlobule.move();
   myGlobule.testOOB();
@@ -242,7 +236,7 @@ void play() {
       
   }
   
-  text(time + "s" ,50,50);
+  text(time + "s" , 50, 50);
 }
 
 /////////////////////////////////////////////
@@ -251,17 +245,17 @@ void loseScreen() {
   
   timeOfGame = millis()/1000;
   fill(50);
-  rect(0,0,800,800);
+  rect(0, 0, 800, 800);
   fill(255);
-  textAlign(CENTER,CENTER);
+  textAlign(CENTER, CENTER);
   
   
   if (time < 60) { 
-   text("Tu as tenu "+ time +" secondes, quel Mickey...", 400, 400);
+    text("Tu as tenu "+ time +" secondes, quel Mickey...", 400, 400);
   } else if (time < 120) {
-     text("Tu as tenu "+ time +" secondes, pas mal pour une baltringue...", 400, 400);
+    text("Tu as tenu "+ time +" secondes, pas mal pour une baltringue...", 400, 400);
   } else {
-     text("Tu as tenu "+ time +" secondes, c'est un peu ridicule quand même...", 400, 400);
+    text("Tu as tenu "+ time +" secondes, c'est un peu ridicule quand même...", 400, 400);
   }
   
 }

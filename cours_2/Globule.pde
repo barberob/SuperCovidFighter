@@ -27,15 +27,15 @@ class Globule {
   
   void display() {
     fill(gcolor);
-    ellipse(x,y,db,db);
+    ellipse(x, y, db, db);
   }
   
   void testOOB() {
-     if (x > (width - db / 2 ) || x < 0) {
+     if (x > (width - db / 2) || x < 0) {
        x = x - xvalue; 
      }
      
-     if (y > ( height - db / 2 ) || y < 0) {
+     if (y > (height - db / 2) || y < 0) {
        y = y - yvalue; 
      }
   }
