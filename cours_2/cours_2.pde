@@ -14,10 +14,11 @@ Corona[] coronas;
 Virus[] viruses;
 int last = 0;
 int m = 0;
-int numOfBombs = 1;
+int numOfCoronas = 1;
+int numOfViruses = 1;
 int time;
 boolean intersecting;
-boolean hasLoosed = false;
+boolean hasLost = false;
 PFont f;
 int timeOfGame = 0;
 
@@ -41,7 +42,7 @@ void setup()
     fond = loadImage("data/trump.jpg");
     fond.resize(800,800);
     
-    initBombs();
+    initCoronas();
     initViruses();    
 }
 
@@ -114,9 +115,9 @@ void keyPressed()
 }
 
 void mousePressed() {
-  if (hasLoosed == true) {
-    hasLoosed = false;
-    numOfBombs = 1;
+  if (hasLost == true) {
+    hasLost = false;
+    numOfCoronas = 1;
     println("ooooooke");
   } 
 }
@@ -136,14 +137,14 @@ void mousePressed() {
 //_______________________________________________________________________________________________FUNCTIONS____________________________________________________________________________________________________________//
 
 
-void initBombs(){
+void initCoronas(){
   
     coronas = new Corona[30];
     for (int i=0 ; i<30 ; i++) {
       
        int x = int(random(0,800)); 
        int y = int(random(0,800)); 
-       int size = int(random(15,50));
+       int size = int(random(7,25));
        
        if (x <= 400) {
          x = 1 + size;
@@ -165,10 +166,9 @@ void initBombs(){
 /////////////////////////////////////////////
 
 
-void moveBombs()
-{
-    
-    for (int i =0 ; i<numOfBombs ; i++) {
+void moveCoronas()
+{   
+    for (int i =0 ; i<numOfCoronas ; i++) {
         coronas[i].move();
         coronas[i].testOOB();
         coronas[i].display();
@@ -179,13 +179,13 @@ void moveBombs()
 /////////////////////////////////////////////
 
 void initViruses() {
-  viruses = new Virus[30];
+  viruses = new Virus[50];
   
-  for (int i=0 ; i<30 ; i++) {
+  for (int i = 0 ; i < 50 ; i++) {
     
-     int x = int(random(0,800)); 
-     int y = int(random(0,800)); 
-     int size = int(random(15,50));
+     int x = int(random(0, 800)); 
+     int y = int(random(0, 800)); 
+     int size = int(random(15, 50));
      
      if (x <= 400) {
        x = 1 + size;
@@ -207,7 +207,7 @@ void initViruses() {
 /////////////////////////////////////////////
 
 void moveViruses() {
-  for (int i =0 ; i<numOfBombs ; i++) {
+  for (int i = 0 ; i < numOfViruses ; i++) {
       viruses[i].move();
       //viruses[i].testOOB();
       viruses[i].display();
@@ -226,18 +226,18 @@ void play() {
   myGlobule.testOOB();
   myGlobule.display();
 
-  moveBombs();
+  moveCoronas();
   moveViruses();
        
-  if (testCollisionBombs()) {
-    hasLoosed = true;
+  if (testCollisionCoronas()) {
+    hasLost = true;
   }
   
   m = millis() - last;
-  if (millis() > last+5000) {
+  if (millis() > last + 5000) {
       last = millis();
-      if (numOfBombs < 30) {
-        numOfBombs++;
+      if (numOfCoronas < 30) {
+        numOfCoronas++;
       }
       
   }
@@ -256,21 +256,21 @@ void loseScreen() {
   textAlign(CENTER,CENTER);
   
   
-  if (time<60) { 
-   text("Tu as tenu "+time +" secondes, quel Mickey...",400,400);
+  if (time < 60) { 
+   text("Tu as tenu "+ time +" secondes, quel Mickey...", 400, 400);
   } else if (time < 120) {
-     text("Tu as tenu "+time +" secondes, pas mal pour une baltringue...",400,400);
+     text("Tu as tenu "+ time +" secondes, pas mal pour une baltringue...", 400, 400);
   } else {
-     text("Tu as tenu "+time +" secondes, c'est un peu ridicule quand même...",400,400);
+     text("Tu as tenu "+ time +" secondes, c'est un peu ridicule quand même...", 400, 400);
   }
   
 }
 
 /////////////////////////////////////////////
 
-boolean testCollisionBombs() {
+boolean testCollisionCoronas() {
    intersecting = false;
-   for (int i=0 ; i<numOfBombs ; i++) {
+   for (int i=0 ; i<numOfCoronas ; i++) {
         if(myGlobule.intersect(coronas[i])) {
             intersecting = true;
             break;

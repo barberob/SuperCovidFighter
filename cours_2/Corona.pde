@@ -16,23 +16,23 @@ class Corona {
   }
   
   void move() {
-    x= x + xSpeed;
+    x = x + xSpeed;
     y = y + ySpeed;
   } 
   
   
   void display() {
     fill(ccolor);
-    ellipse(x,y,r,r);
+    ellipse(x, y, r*2, r*2);
   }
   
   void testOOB() {
-     if (x > (width - r / 2 ) || x < 0) {
+     if (x > (width - r) || x < 0) {
       // x = - x; 
        xSpeed = - xSpeed;
      }
      
-     if (y > ( height - r / 2 ) || y < 0) {
+     if (y > (height - r) || y < 0) {
        //y = - y; 
        ySpeed = - ySpeed;
      }
