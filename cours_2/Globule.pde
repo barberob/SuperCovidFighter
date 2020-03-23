@@ -1,5 +1,4 @@
-class Globule
-{
+class Globule {
   int x, y, r;
   int xvalue, yvalue;
   color gcolor;
@@ -9,8 +8,7 @@ class Globule
   
   
   
-  Globule (int newX, int newY, int newRadius, color newColor)
-  {
+  Globule (int newX, int newY, int newRadius, color newColor) {
     x = newX;
     y = newY;
     r = newRadius;
@@ -18,8 +16,7 @@ class Globule
     
   }
   
-  void move()
- {
+  void move() {
   //  x= x + xvalue;
   //  y = y + yvalue;
     x = mouseX;
@@ -28,26 +25,23 @@ class Globule
   } 
   
   
-  void display() 
-  {
+  void display() {
     fill(gcolor);
     ellipse(x,y,db,db);
   }
   
-  void testOOB()
-  {
-     if (x > (width - db /2 ) || x < 0) {
+  void testOOB() {
+     if (x > (width - db / 2 ) || x < 0) {
        x = x - xvalue; 
      }
      
-     if (y > ( height - db /2 ) || y < 0) {
+     if (y > ( height - db / 2 ) || y < 0) {
        y = y - yvalue; 
      }
   }
   
   
-  boolean intersect(Corona b) 
-  {
+  boolean intersect(Corona b) {
       float distance = dist(x, y, b.x, b.y);
   
       if (distance < r + b.r) 

@@ -11,6 +11,7 @@ int background = 0;
 int dB = 20; 
 boolean hasTouched = false;
 Corona[] coronas;
+Virus[] viruses;
 int last = 0;
 int m = 0;
 int numOfBombs = 1;
@@ -24,7 +25,6 @@ int timeOfGame = 0;
 //AudioPlayer musiqueFond;
 
 Globule myGlobule = new Globule ( 250, 250, 15, color(255));
-
 
 void setup() 
 {
@@ -42,7 +42,7 @@ void setup()
     fond.resize(800,800);
     
     initBombs();
-    
+    initViruses();    
 }
 
 void draw() 
@@ -55,7 +55,7 @@ void draw()
     
     else
     {
-       looseScreen();
+       loseScreen();
     }
 }
 
@@ -157,7 +157,7 @@ void initBombs(){
          y = 799 - size;
        }
        
-        coronas[i] = new Corona( x, y, size, color(255, 0, 0));
+        coronas[i] = new Corona(x, y, size, color(255, 0, 0));
     } 
 }
 
@@ -178,8 +178,46 @@ void moveBombs()
 
 /////////////////////////////////////////////
 
+void initViruses() {
+  viruses = new Virus[30];
+  
+  for (int i=0 ; i<30 ; i++) {
+    
+     int x = int(random(0,800)); 
+     int y = int(random(0,800)); 
+     int size = int(random(15,50));
+     
+     if (x <= 400) {
+       x = 1 + size;
+     } else {
+       x = 799 - size;
+     }
+     
+     if (y <= 400) {
+       y = 1 + size;
+     } else {
+       y = 799 - size;
+     }
+     
+    viruses[i] = new Virus(x, y, 50, color(0, 255, 255));
+  } 
+  
+}
+
+/////////////////////////////////////////////
+
+void moveViruses() {
+  for (int i =0 ; i<numOfBombs ; i++) {
+      viruses[i].move();
+      //viruses[i].testOOB();
+      viruses[i].display();
+  } 
+}
+
+/////////////////////////////////////////////
+
 void play() {
- time = millis()/1000 - timeOfGame;
+  time = millis()/1000 - timeOfGame;
     
   background(background);
   image(fond,0,0);
@@ -189,6 +227,7 @@ void play() {
   myGlobule.display();
 
   moveBombs();
+  moveViruses();
        
   if (testCollisionBombs()) {
     hasLoosed = true;
@@ -208,7 +247,7 @@ void play() {
 
 /////////////////////////////////////////////
 
-void looseScreen() {
+void loseScreen() {
   
   timeOfGame = millis()/1000;
   fill(50);
@@ -226,7 +265,6 @@ void looseScreen() {
   }
   
 }
-
 
 /////////////////////////////////////////////
 
