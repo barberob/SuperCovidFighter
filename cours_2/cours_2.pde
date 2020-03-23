@@ -5,16 +5,15 @@ Serial myPort;
 PImage fond,ball;
 float xvalue = 0;
 float yvalue = 0;
-int AngleVision=90;
+int AngleVision= 90;
 int buttonValue;
-int background =0;
+int background = 0;
 int dB = 20; 
 boolean hasTouched =false;
 Corona[] coronas;
 int last = 0;
-int lastAttack =0;
 int m = 0;
-int numOfBombs=0;
+int numOfBombs = 0;
 int time;
 
 
@@ -22,8 +21,11 @@ boolean intersecting;
 boolean hasLoosed = false;
 boolean canAttack = true;
 boolean isAttacking = false;
-int attackDuration = 500; //ms
+boolean attackInProgress = false;
+int attackDuration = 1000; //ms
 int attackCooldown = 3000; //ms
+int lastAttack = 0;
+
 
 
 PFont f;
@@ -73,8 +75,6 @@ void draw()
 
 //__________________________________________________________________________________________________________________________________________________________________________________________________________//
 
-
-
 void serialEvent(Serial myPort) 
 {
     String serialStr = myPort.readStringUntil('\n');
@@ -97,51 +97,11 @@ void serialEvent(Serial myPort)
       myAttack.y = myGlobule.y;
       myGlobule.x += newX;
       myGlobule.y += newY;
-      
+     
     }
 }
 
-//float calculate( int returnValue, int baseValue ) 
-//{
-//    int diff = returnValue - baseValue ;
-//    float angle = AngleVision * (diff/70.0);
-//    return angle * PI /180 ;  
-//}
-
-
-int calculate (int baseValue, int returnValue )
-{
-  int dif = returnValue - baseValue;
-  return round(dif/5);
-}
-
-
-
-
 //_______________________________________________________________________________________________EVENTS____________________________________________________________________________________________________________//
-
-void keyPressed()
-{
-  if (key == CODED ) 
-  {
-     if(keyCode == UP) if (myGlobule.yvalue>-5) 
-     {
-       myGlobule.yvalue -= 2; 
-     }
-     if(keyCode == LEFT) if (myGlobule.xvalue>-5) 
-     {
-       myGlobule.xvalue -= 2;
-     }
-     if(keyCode == RIGHT) if(myGlobule.xvalue<5)
-     {
-       myGlobule.xvalue += 2;
-     }
-     if(keyCode == DOWN) if(myGlobule.yvalue<5)
-     {
-       myGlobule.yvalue += 2;  
-     }
-  }
-}
 
 void mousePressed() {
   if (hasLoosed == true) 
@@ -159,21 +119,20 @@ void initBombs(){
     coronas = new Corona[30];
   
     for (int i=0 ; i<30 ; i++)
-    {
-    
+    {  
        int x = int(random(0,800)); 
        int y = int(random(0,800)); 
        int size = int(random(5,25));
        
        if(x <= 400) {
          x = 1 + size;
-       }else{
+       } else {
          x = 799 - size;
        }
        
        if(y <= 400) {
          y = 1 + size;
-       }else{
+       } else {
          y = 799 - size;
        }
        
@@ -195,12 +154,9 @@ void moveBombs()
           coronas[i].move();
           coronas[i].testOOB();
           coronas[i].display();
-        }
-        else
-        {
+        } else {
           coronas[i].x = 1600;
           coronas[i].y = 1600;
-          
         }
     } 
 }
@@ -214,16 +170,6 @@ void play() {
   background(background);
   image(fond,0,0);
   
-  
-  
-  //myGlobule.move();
-  
-  if(isAttacking == true && canAttack == true) 
-  {
-    
-    testDestroyBombs();
-    myAttack.display();
-  }
   
   myGlobule.testOOB();
   myGlobule.display();
@@ -243,13 +189,62 @@ void play() {
       {
         numOfBombs++;
       }
-      
   }
+  
+  
+  
+  
+  //if(isAttacking == true && canAttack == true) 
+  //{
+    
+  //  if(millis() > lastAttack + attackDuration)
+  //  {
+  //      lastAttack = millis();
+  //      canAttack =false; 
+  //  }
+  //  else
+  //  {
+  //     testDestroyBombs();
+  //     myAttack.display();
+  //  }
+  //}
+  
+  
   if(millis() > lastAttack + attackCooldown)
   {
+    
       lastAttack = millis();
       canAttack =true; 
+  } 
+  
+ if(isAttacking == true || attackInProgress == true )
+ { 
+
+      if(millis() > lastAttack + attackDuration)
+      {
+          lastAttack = millis();
+          canAttack =false; 
+          attackInProgress = false;
+          
+      } else {
+         attackInProgress = true;
+         testDestroyBombs();
+         myAttack.display();
+         println("mkay");
+      }
+
+ }
+  
+  
+  //
+  if(canAttack == true) 
+  {
+    text( "ok" ,750,50);
+  } else { 
+    text("nope", 750, 50);
   }
+  
+
   
   //if( isAttacking == true  &&  millis() > lastAttack + attackDuration)
   //{
@@ -257,10 +252,7 @@ void play() {
   //    canAttack =false; 
   //}
   
-  if (isAttacking == true) 
-  {
-      
-  }
+  
   
   text(time + "s" ,50,50);
 }
@@ -276,12 +268,11 @@ void looseScreen() {
   textAlign(CENTER,CENTER);
   
   
-  if(time<60){ 
+  if(time<60) { 
    text("Tu as tenu "+time +" secondes, quel Mickey...",400,400);
-  }else if (time < 120){
+  } else if (time < 120) {
      text("Tu as tenu "+time +" secondes, pas mal pour une baltringue...",400,400);
-  }
-  else{
+  } else {
      text("Tu as tenu "+time +" secondes, c'est un peu ridicule quand même...",400,400);
   }
   
@@ -299,9 +290,7 @@ boolean testCollisionBombs()
         {
             intersecting = true;
             break;
-        }
-        else
-        {
+        } else {
             intersecting = false;
         }
    }   
@@ -309,9 +298,7 @@ boolean testCollisionBombs()
     if(intersecting == true)
     {
         return true;
-    }
-    else 
-    {
+    } else {
         return false;
     }
     
@@ -325,9 +312,7 @@ void testDestroyBombs()
       if(myAttack.intersect(coronas[i]))
       {
           coronas[i].isDead =true;
-          coronas[i].r = 0;
-          canAttack = false;
-          break;
+          coronas[i].r = 0;      
       } 
    }    
 }

@@ -7,15 +7,15 @@ class Corona
   boolean isDead = false;
   
   
-   Corona(int newX, int newY, int newRayon, color newCouleur)
+  Corona(int newX, int newY, int newRayon, color newCouleur)
   {
     x = newX;
     y = newY;
     r = newRayon;
     db = r*2;
     couleur = newCouleur;
-    xSpeed = int(random(0,5));
-    ySpeed = int(random(0,5));
+    xSpeed = int(random(1,5));
+    ySpeed = int(random(1,5));
     
   }
   
