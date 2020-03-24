@@ -13,16 +13,16 @@ boolean hasTouched = false;
 Corona[] coronas;
 Virus[] viruses;
 int last = 0;
-int m = 0;
-int n = 1;
+int n = 0;
 int numOfCoronas = 1;
-int numOfViruses = 1;
+int numOfViruses = 0;
+int xdirection, ydirection;
 int time;
 boolean intersecting;
 boolean hasLost = false;
 PFont f;
 int timeOfGame = 0;
-int direction;
+int spawnVirusesTimer = 0;
 
 //Minim minim;
 //AudioPlayer musiqueFond;
@@ -44,8 +44,7 @@ void setup()
     fond = loadImage("data/trump.jpg");
     fond.resize(800,800);
     
-    initCoronas();
-    initViruses();    
+    initCoronas(); 
 }
 
 void draw() 
@@ -160,8 +159,7 @@ void initCoronas(){
 /////////////////////////////////////////////
 
 
-void moveCoronas()
-{   
+void moveCoronas() {   
     for (int i =0 ; i < numOfCoronas ; i++) {
         coronas[i].move();
         coronas[i].testOOB();
@@ -175,38 +173,45 @@ void moveCoronas()
 void initViruses() {
   viruses = new Virus[10];
   
-  int rightOrLeftSpawnPoint = int(random(1, 2));
+  int SpawnPoint = int(random(1, 5));
   
-  int xlocate;
+  int xlocate = 0;
+  int ylocate = 0;
   
-  if (rightOrLeftSpawnPoint == 1) {
-    xlocate = int(random(0, 100));
-    direction = 1;
-  } else {
-    xlocate = int(random(700, 800));
-    direction = -1;
+  xdirection = 0;
+  ydirection = 0;
+  
+  if (SpawnPoint == 1) {
+    ylocate = int(random(0, 800));
+    xdirection = 5;
+  } else if (SpawnPoint == 2) {
+    xlocate = 800;
+    ylocate = int(random(0, 800));
+    xdirection = -5;
+  } else if (SpawnPoint == 3) {
+    ylocate = 800;
+    xlocate = int(random(0, 800));
+    ydirection = -5;
+  } else if (SpawnPoint == 4) {
+    xlocate = int(random(0, 800));
+    ydirection = 5;
   }
   
   for (int i = 0 ; i < 10 ; i++) {
     
-     int x = int(random(xlocate, xlocate + (300 * direction))); 
-     int y = int(10 * i + random(0, 10)); 
+    int x = 0, y = 0;
+    
+    if (SpawnPoint == 1 || SpawnPoint == 2) {
+      x =  int(10 * i + random(xlocate, xlocate + 20));
+      y =  ylocate;
+    } else if (SpawnPoint == 3 || SpawnPoint == 4) {
+      x =  xlocate;
+      y =  int(10 * i + random(ylocate, ylocate + 20));
+    }
+    
      int size = int(random(15, 20));
-     
-     if (x <= 400) {
-       x = 1 + size;
-     } else {
-       x = 799 - size;
-     }
-     
-     if (y <= 400) {
-       y = 1 + size;
-     } else {
-       y = 799 - size;
-     }
-
-     
-    viruses[i] = new Virus(x, y, 50, color(0, 255, 255));
+  
+    viruses[i] = new Virus(x, y, size, color(0, 255, 255));
   } 
   
 }
@@ -214,14 +219,15 @@ void initViruses() {
 /////////////////////////////////////////////
 
 void moveViruses() {
-  
-  if (numOfViruses > 5 * n) {  
-    for (int i = 0 ; i < numOfViruses ; i++) {
-      viruses[i].move(direction);
-      //viruses[i].testOOB();
+    if (viruses == null) return;
+    for (int i = 0; i < viruses.length; i++) {
+      viruses[i].move(xdirection, ydirection);
       viruses[i].display();
-    } 
-  }
+    }   
+    
+    if (viruses[viruses.length - 1].testOOB()) {
+      initViruses();
+    }
 }
 
 /////////////////////////////////////////////
@@ -238,17 +244,19 @@ void play() {
 
   moveCoronas();
   moveViruses();
-       
+  
   if (testCollisionCoronas()) {
     hasLost = true;
   }
   
-  m = millis() - last;
   if (millis() > last + 5000) {
       last = millis();
       if (numOfCoronas < 30) {
         numOfCoronas++;
-        numOfViruses++;
+      }
+      
+      if (numOfCoronas == 4 && viruses == null){
+        initViruses();
       }
       
   }
