@@ -16,19 +16,21 @@ class Attack
       
     }
     
-    void display() 
+    void display(int attackWidth) 
     {
       fill(couleur);
       ellipseMode(CENTER);
-      ellipse(x,y,db,db);
+      ellipse(x,y,attackWidth,attackWidth);
      
     }
     
-    boolean intersect(Corona b) 
+    boolean intersect(int attackWidth ,Corona b) 
     {
+        int attackRayon = attackWidth /2 ;
+        
         float distance = dist(x, y, b.x, b.y);
     
-        if (distance < r + b.r) 
+        if (distance < attackRayon + b.r) 
         {
           return true;
         }
@@ -36,6 +38,18 @@ class Attack
         {
           return false;
         }
+    }
+    
+    void testDestroyBombs(int attackWidth)
+    {
+       for (int i=0 ; i<numOfBombs ; i++)
+       {
+          if(myAttack.intersect(attackWidth,coronas[i]))
+          {
+              coronas[i].isDead =true;
+              coronas[i].r = 0;      
+          } 
+       }    
     }
   
 }

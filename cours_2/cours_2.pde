@@ -25,6 +25,7 @@ boolean attackInProgress = false;
 int attackDuration = 1000; //ms
 int attackCooldown = 3000; //ms
 int lastAttack = 0;
+int timeOfAttack = 0;
 
 
 
@@ -82,9 +83,10 @@ void serialEvent(Serial myPort)
     int values[] = int(split(serialStr, ','));
     if( values.length == 3 ) 
     {
-      if(values[2]==1)
+      if(values[2]==1 && canAttack == true)
       {
         isAttacking  = true;
+        
       }
       else
       {
@@ -149,7 +151,7 @@ void moveBombs()
     
     for (int i =0 ; i<numOfBombs ; i++)
     {
-        if(coronas[i].isDead == false){
+        if(coronas[i].isDead == false) {
         
           coronas[i].move();
           coronas[i].testOOB();
@@ -170,7 +172,7 @@ void play() {
   background(background);
   image(fond,0,0);
   
-  
+  testAttack();
   myGlobule.testOOB();
   myGlobule.display();
 
@@ -190,69 +192,6 @@ void play() {
         numOfBombs++;
       }
   }
-  
-  
-  
-  
-  //if(isAttacking == true && canAttack == true) 
-  //{
-    
-  //  if(millis() > lastAttack + attackDuration)
-  //  {
-  //      lastAttack = millis();
-  //      canAttack =false; 
-  //  }
-  //  else
-  //  {
-  //     testDestroyBombs();
-  //     myAttack.display();
-  //  }
-  //}
-  
-  
-  if(millis() > lastAttack + attackCooldown)
-  {
-    
-      lastAttack = millis();
-      canAttack =true; 
-  } 
-  
- if(isAttacking == true || attackInProgress == true )
- { 
-
-      if(millis() > lastAttack + attackDuration)
-      {
-          lastAttack = millis();
-          canAttack =false; 
-          attackInProgress = false;
-          
-      } else {
-         attackInProgress = true;
-         testDestroyBombs();
-         myAttack.display();
-         println("mkay");
-      }
-
- }
-  
-  
-  //
-  if(canAttack == true) 
-  {
-    text( "ok" ,750,50);
-  } else { 
-    text("nope", 750, 50);
-  }
-  
-
-  
-  //if( isAttacking == true  &&  millis() > lastAttack + attackDuration)
-  //{
-  //    lastAttack = millis();
-  //    canAttack =false; 
-  //}
-  
-  
   
   text(time + "s" ,50,50);
 }
@@ -304,15 +243,55 @@ boolean testCollisionBombs()
     
 }
 
-//////////////////////////////////////////////
-void testDestroyBombs()
+//////////////////////////////////////
+//void testDestroyBombs()
+//{
+//   for (int i=0 ; i<numOfBombs ; i++)
+//   {
+//      if(myAttack.intersect(coronas[i]))
+//      {
+//          coronas[i].isDead =true;
+//          coronas[i].r = 0;      
+//      } 
+//   }    
+//}
+/////////////////////////////////////////////
+void testAttack()
 {
-   for (int i=0 ; i<numOfBombs ; i++)
-   {
-      if(myAttack.intersect(coronas[i]))
-      {
-          coronas[i].isDead =true;
-          coronas[i].r = 0;      
-      } 
-   }    
+  
+  if(millis() > lastAttack + attackCooldown) {
+    
+      lastAttack = millis();
+      canAttack = true; 
+  } 
+  
+  
+  if(canAttack == true && isAttacking == true) {
+    
+       canAttack = false;
+       lastAttack = millis();
+       attackInProgress = true;
+  }
+  
+  if(millis() > lastAttack + attackDuration) {
+        
+       attackInProgress = false;
+  }
+  
+  if(millis() < lastAttack + attackDuration && attackInProgress == true) {
+        
+       int timeAttacking = millis() - lastAttack ;
+       int attackWidth = int(map(timeAttacking,0,1000,myGlobule.db,myAttack.maxRange));
+       myAttack.display(attackWidth);
+       myAttack.testDestroyBombs(attackWidth);
+  }
+  
+  if(canAttack == true) {
+    
+    text( "ok" ,750,50);
+  } else { 
+    
+    text("nope", 750, 50);
+  }
+  
 }
