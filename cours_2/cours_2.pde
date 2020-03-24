@@ -249,13 +249,19 @@ void play() {
     hasLost = true;
   }
   
+  if(viruses != null) {
+    if (testCollisionViruses()) {
+      hasLost = true;
+    }
+  }
+  
   if (millis() > last + 5000) {
       last = millis();
       if (numOfCoronas < 30) {
         numOfCoronas++;
       }
       
-      if (numOfCoronas == 4 && viruses == null){
+      if (numOfCoronas == 5 && viruses == null){
         initViruses();
       }
       
@@ -289,7 +295,7 @@ void loseScreen() {
 
 boolean testCollisionCoronas() {
    intersecting = false;
-   for (int i=0 ; i<numOfCoronas ; i++) {
+   for (int i = 0; i < numOfCoronas; i++) {
         if(myGlobule.intersect(coronas[i])) {
             intersecting = true;
             break;
@@ -307,3 +313,22 @@ boolean testCollisionCoronas() {
 }
 
 //////////////////////////////////////////////
+
+boolean testCollisionViruses() {
+   intersecting = false;
+   for (int i = 0; i < viruses.length; i++) {
+        if(myGlobule.intersect(viruses[i])) {
+            intersecting = true;
+            break;
+        } else {
+            intersecting = false;
+        }
+   }   
+
+    if(intersecting == true) {
+        return true;
+    } else {
+        return false;
+    }
+    
+}

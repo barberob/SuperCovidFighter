@@ -41,10 +41,23 @@ class Globule {
   }
   
   
-  boolean intersect(Corona b) {
-      float distance = dist(x, y, b.x, b.y);
+  boolean intersect(Corona c) {
+      float distance = dist(x, y, c.x, c.y);
   
-      if (distance < r + b.r) 
+      if (distance < r + c.r) 
+      {
+        return true;
+      }
+      else 
+      {
+        return false;
+      }
+  }
+  
+  boolean intersect(Virus v) {
+      float distance = dist(x, y, v.x, v.y);
+  
+      if (distance < r + v.r) 
       {
         return true;
       }
