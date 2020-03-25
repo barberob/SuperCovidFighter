@@ -45,10 +45,10 @@ class Attack
     {
        for (int i=0 ; i<numOfCoronas ; i++)
        {
-          if(myAttack.intersect(attackWidth,coronas[i]))
+          if(myAttack.intersect(attackWidth,coronas.get(i)))
           {
-              coronas[i].isDead =true;
-              coronas[i].r = 0;      
+              coronas.get(i).isDead =true;
+              coronas.get(i).r = 0;      
           } 
        }    
     }

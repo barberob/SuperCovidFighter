@@ -10,7 +10,7 @@ int background = 0;
 int dB = 20;
 int inc =0;
 boolean hasTouched = false;
-Corona[] coronas;
+ArrayList<Corona> coronas = new ArrayList<Corona>();
 Virus[] viruses;
 Globule myGlobule;
 int last = 0;
@@ -59,13 +59,13 @@ void setup()
  
     fond.resize(800,800);
     
-    initCoronas(); 
+    //initCoronas(); 
     
 }
 
 void draw() 
 {
-  println(inc);
+  
     if (startMenu == true) {
       
         fill(#25F025);
@@ -120,9 +120,9 @@ void serialEvent(Serial myPort)
       } else {
         
         if(startMenu == true) {
-          
           inc =0 ;
         }
+        
         isAttacking = false;
       }
       
@@ -159,8 +159,8 @@ void initGlobule() {
 
 void initCoronas() {
   
-    coronas = new Corona[30];
-    for (int i=0 ; i < 30 ; i++) {
+    //coronas = new Corona[30];
+    //for (int i=0 ; i < 30 ; i++) {
       
        int x = int(random(0, 800)); 
        int y = int(random(0, 800)); 
@@ -182,8 +182,14 @@ void initCoronas() {
          y = 799 - size;
        }
        
-        coronas[i] = new Corona(x, y, size, color(255, 0, 0));
-    } 
+      if(numOfCoronas > 0 && numOfCoronas > coronas.size()) {
+        coronas.add( new Corona(x, y, size, color(255, 0, 0)));
+      }
+      
+      println(coronas.size());
+       
+        
+    //} 
 }
 
 /////////////////////////////////////////////
@@ -192,15 +198,15 @@ void moveCoronas() {
     
     for (int i =0 ; i<numOfCoronas ; i++) {
       
-        if(coronas[i].isDead == false) {
+        if(coronas.get(i).isDead == false) {
         
-          coronas[i].move();
-          coronas[i].testOOB();
-          coronas[i].display();
+          coronas.get(i).move();
+          coronas.get(i).testOOB();
+          coronas.get(i).display();
         } else {
           
-          coronas[i].x = 1600;
-          coronas[i].y = 1600;
+          coronas.get(i).x = 1600;
+          coronas.get(i).y = 1600;
         }
     } 
 }
@@ -275,6 +281,7 @@ void moveViruses() {
 
 void play() {
   
+  initCoronas();
   time = millis()/1000 - timeOfGame;
     
   background(background);
@@ -354,7 +361,7 @@ boolean testCollisionCoronas() {
    intersecting = false;
    for (int i = 0; i < numOfCoronas; i++) {
      
-        if(myGlobule.intersect(coronas[i])) {
+        if(myGlobule.intersect(coronas.get(i))) {
           
             intersecting = true;
             break;
