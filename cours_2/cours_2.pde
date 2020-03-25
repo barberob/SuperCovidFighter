@@ -7,7 +7,8 @@ float xvalue = 0;
 float yvalue = 0;
 int buttonValue;
 int background = 0;
-int dB = 20; 
+int dB = 20;
+int inc =0;
 boolean hasTouched = false;
 Corona[] coronas;
 Virus[] viruses;
@@ -64,10 +65,14 @@ void setup()
 
 void draw() 
 {
+  println(inc);
     if (startMenu == true) {
       
-        fill(#FF0000);
+        fill(#25F025);
+        background(background);
         rect(500,500,0,0);
+        textAlign(CENTER);
+        text("Appuyez longuement pour lancer le jeu", width/2, height/2);
         
     } else {
       
@@ -95,18 +100,35 @@ void serialEvent(Serial myPort)
     if( values.length == 3 ) {
       
       
-      if(values[2]==1 && canAttack == true) {
+      if(values[2]==1) {
         
-        isAttacking  = true; 
-        startMenu = false;
+        if (inc < 51) {
+          inc++;
+        }
         
+        if(canAttack == true) {
+          
+           isAttacking  = true; 
+        }
+        
+        if(inc == 50) {
+          
+           lastAttack=millis();
+           startMenu = false;
+        }
+
       } else {
         
+        if(startMenu == true) {
+          
+          inc =0 ;
+        }
         isAttacking = false;
       }
       
-      int newX = int(map(values[0],-509,514,-5,5));
-      int newY = int(map(values[1],-507,516,-5,5));
+      int newX = int(map(values[0], -509, 514, -5, 5));
+      int newY = int(map(values[1], -507, 516, -5, 5));
+      
       myAttack.x = myGlobule.x;
       myAttack.y = myGlobule.y;
       myGlobule.x += newX;
@@ -297,6 +319,8 @@ void play() {
   }
  
   text(time + "s" , 50, 50);
+  
+  displayCoolDown();
 }
 
 /////////////////////////////////////////////
@@ -413,8 +437,12 @@ void testAttack()
        myAttack.display(attackWidth);
        myAttack.testDestroyBombs(attackWidth);
     }
-    
-    if(canAttack == false) {
+}
+
+
+void displayCoolDown() {
+  
+  if(canAttack == false) {
       
       int cD = millis() - lastAttack;
       int cDBarWidth = int(map(cD,0,attackCooldown,0,150));
@@ -428,7 +456,4 @@ void testAttack()
       fill(#26EB4A);
       rect(600, 50, 150, 20, 3);
     }
-    
- 
-  
 }
