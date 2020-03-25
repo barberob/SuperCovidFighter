@@ -22,8 +22,8 @@ boolean hasLoosed = false;
 boolean canAttack = true;
 boolean isAttacking = false;
 boolean attackInProgress = false;
-int attackDuration = 1000; //ms
-int attackCooldown = 3000; //ms
+int attackDuration = 750; //ms
+int attackCooldown = 10000; //ms
 int lastAttack = 0;
 int timeOfAttack = 0;
 
@@ -115,7 +115,6 @@ void mousePressed() {
 
 //_______________________________________________________________________________________________FUNCTIONS____________________________________________________________________________________________________________//
 
-
 void initBombs(){
   
     coronas = new Corona[30];
@@ -142,7 +141,6 @@ void initBombs(){
     } 
 }
 
-
 /////////////////////////////////////////////
 
 
@@ -167,10 +165,13 @@ void moveBombs()
 /////////////////////////////////////////////
 
 void play() {
+  
   time = millis()/1000 - timeOfGame;
     
   background(background);
   image(fond,0,0);
+  
+  rect(600, 50, 150, 20, 3);
   
   testAttack();
   myGlobule.testOOB();
@@ -193,7 +194,9 @@ void play() {
       }
   }
   
+  
   text(time + "s" ,50,50);
+ 
 }
 
 /////////////////////////////////////////////
@@ -206,7 +209,6 @@ void looseScreen() {
   fill(255);
   textAlign(CENTER,CENTER);
   
-  
   if(time<60) { 
    text("Tu as tenu "+time +" secondes, quel Mickey...",400,400);
   } else if (time < 120) {
@@ -217,7 +219,6 @@ void looseScreen() {
   
 }
 
-
 /////////////////////////////////////////////
 
 boolean testCollisionBombs()
@@ -225,65 +226,60 @@ boolean testCollisionBombs()
    intersecting = false;
    for (int i=0 ; i<numOfBombs ; i++)
    {
-        if(myGlobule.intersect(coronas[i]))
-        {
-            intersecting = true;
-            break;
-        } else {
-            intersecting = false;
-        }
+      if(myGlobule.intersect(coronas[i]))
+      {
+          intersecting = true;
+          break;
+      } else {
+          intersecting = false;
+      }
    }   
 
-    if(intersecting == true)
-    {
-        return true;
-    } else {
-        return false;
-    }
+  if(intersecting == true)
+  {
+      return true;
+  } else {
+      return false;
+  }
     
 }
 
-//////////////////////////////////////
-//void testDestroyBombs()
-//{
-//   for (int i=0 ; i<numOfBombs ; i++)
-//   {
-//      if(myAttack.intersect(coronas[i]))
-//      {
-//          coronas[i].isDead =true;
-//          coronas[i].r = 0;      
-//      } 
-//   }    
-//}
 /////////////////////////////////////////////
+
 void testAttack()
 {
   
   if(millis() > lastAttack + attackCooldown) {
     
-      lastAttack = millis();
-      canAttack = true; 
+    lastAttack = millis();
+    canAttack = true; 
+    
+    
   } 
   
   
   if(canAttack == true && isAttacking == true) {
     
-       canAttack = false;
-       lastAttack = millis();
-       attackInProgress = true;
+     canAttack = false;
+     lastAttack = millis();
+     attackInProgress = true;
   }
   
   if(millis() > lastAttack + attackDuration) {
         
-       attackInProgress = false;
+     attackInProgress = false;
   }
   
   if(millis() < lastAttack + attackDuration && attackInProgress == true) {
         
-       int timeAttacking = millis() - lastAttack ;
-       int attackWidth = int(map(timeAttacking,0,1000,myGlobule.db,myAttack.maxRange));
-       myAttack.display(attackWidth);
-       myAttack.testDestroyBombs(attackWidth);
+     int timeWhileAttacking = millis() - lastAttack ;
+     int attackWidth = int(map(timeWhileAttacking,0,attackDuration,myGlobule.db,(myAttack.maxRange*2)));
+     if (attackWidth > myAttack.maxRange) {
+       attackWidth = myAttack.maxRange ; 
+     }
+     
+     myAttack.display(attackWidth);
+     myAttack.testDestroyBombs(attackWidth);
   }
   
   if(canAttack == true) {
@@ -293,5 +289,18 @@ void testAttack()
     
     text("nope", 750, 50);
   }
+  
+  if(canAttack == false)
+  {
+    int cD = millis() - lastAttack;
+    int cDBarWidth = int(map(cD,0,attackCooldown,0,150));
+    fill(0);
+    rect(600, 50, cDBarWidth, 20, 3);
+  } else {
+    fill(0);
+    rect(600, 50, 150, 20, 3);
+ 
+  }
+    
   
 }
