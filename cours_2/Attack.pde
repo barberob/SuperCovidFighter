@@ -5,6 +5,7 @@ class Attack
     color couleur;
     boolean hasTouchedSomething = false;
     int maxRange = 100;
+    
   
     Attack (int newX, int newY, color newCouleur)
     {

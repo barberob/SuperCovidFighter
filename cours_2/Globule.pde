@@ -1,11 +1,11 @@
 class Globule {
+  
   int x, y, r, db;
   int xvalue, yvalue;
   color gColor;
   int vitesse = 5; 
   boolean hasTouchedSomething = false;
-  
-  
+  PImage imgGlobule;
   
   Globule (int newX, int newY, int newRadius, color newColor) {
     
@@ -14,6 +14,8 @@ class Globule {
     r = newRadius;
     db = r*2;
     gColor = newColor; 
+    imgGlobule = loadImage("data/globule.png");
+    imgGlobule.resize(db,db);
   }
   
   void move() {
@@ -26,8 +28,12 @@ class Globule {
   
   
   void display() {
-    fill(gColor);
+    fill(#FFFFFF, 0);
+    noStroke();
     ellipse(x, y, db, db);
+    imageMode(CENTER);
+    image(imgGlobule,x,y);
+    stroke(0);
   }
   
   void testOOB() {
