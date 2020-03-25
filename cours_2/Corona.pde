@@ -13,8 +13,8 @@ class Corona {
     r = newRadius;
     db = r*2;
     cColor = newColor;
-    xSpeed = int(random(0, 5));
-    ySpeed = int(random(0, 5));
+    xSpeed = int(random(1, 5));
+    ySpeed = int(random(1, 5));
     
   }
   
