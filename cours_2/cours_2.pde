@@ -1,11 +1,10 @@
 import processing.serial.*;
 //import ddf.minim.*;
 
-Serial port;
+Serial myPort;
 PImage fond, ball;
 float xvalue = 0;
 float yvalue = 0;
-int AngleVision = 90;
 int buttonValue;
 int background = 0;
 int dB = 20; 
@@ -16,6 +15,7 @@ int last = 0;
 int n = 0;
 int numOfCoronas = 1;
 int numOfViruses = 0;
+
 int xdirection, ydirection;
 int time;
 boolean intersecting;
@@ -24,10 +24,21 @@ PFont f;
 int timeOfGame = 0;
 int spawnVirusesTimer = 0;
 
+
+boolean canAttack = true;
+boolean isAttacking = false;
+boolean attackInProgress = false;
+int attackDuration = 750; //ms
+int attackCooldown = 10000; //ms
+int lastAttack = 0;
+int timeOfAttack = 0;
+
+
 //Minim minim;
 //AudioPlayer musiqueFond;
 
 Globule myGlobule = new Globule ( 250, 250, 15, color(255));
+Attack myAttack = new Attack(250, 250, color(0));
 
 void setup() 
 {
@@ -38,8 +49,8 @@ void setup()
     textFont(f);
     smooth();
     size(800, 800);
-    //port = new Serial(this, "COM5", 9600);
-    //port.bufferUntil('\n');
+    myPort = new Serial(this, "COM5", 9600);
+    myPort.bufferUntil('\n');
     background(background);
     fond = loadImage("data/trump.jpg");
     fond.resize(800,800);
@@ -51,84 +62,54 @@ void draw()
 {
     
     if (hasLost == false) {
+      
         play();
     } else {
+      
        loseScreen();
     }
 }
 
-
-
 //__________________________________________________________________________________________________________________________________________________________________________________________________________//
 
-
-
-void serialEvent(Serial port) {
-    String serialStr = port.readStringUntil('\n');
+void serialEvent(Serial myPort) 
+{
+    String serialStr = myPort.readStringUntil('\n');
     serialStr = trim(serialStr);
     int values[] = int(split(serialStr, ','));
-    if( values.length == 4 ) {
-          
+    if( values.length == 3 ) {
+      
+      if(values[2]==1 && canAttack == true) {
+        
+        isAttacking  = true; 
+      }
+      else {
+        
+        isAttacking = false;
+      }
+      
+      int newX = int(map(values[0],-509,514,-5,5));
+      int newY = int(map(values[1],-507,516,-5,5));
+      myAttack.x = myGlobule.x;
+      myAttack.y = myGlobule.y;
+      myGlobule.x += newX;
+      myGlobule.y += newY;
+      println("swag");
     }
 }
 
-//float calculate( int returnValue, int baseValue ) 
-//{
-//    int diff = returnValue - baseValue ;
-//    float angle = AngleVision * (diff/70.0);
-//    return angle * PI /180 ;  
-//}
-
-
-int calculate (int baseValue, int returnValue ) {
-  int dif = returnValue - baseValue;
-  return round(dif/5);
-}
-
-
-
-
 //_______________________________________________________________________________________________KEY EVENTS____________________________________________________________________________________________________________//
 
-void keyPressed() {
-  if (key == CODED ) {
-     if(keyCode == UP) if (myGlobule.yvalue>-5) {
-       myGlobule.yvalue -= 2; 
-     }
-     if(keyCode == LEFT) if (myGlobule.xvalue>-5) {
-       myGlobule.xvalue -= 2;
-     }
-     if(keyCode == RIGHT) if(myGlobule.xvalue<5) {
-       myGlobule.xvalue += 2;
-     }
-     if(keyCode == DOWN) if(myGlobule.yvalue<5) {
-       myGlobule.yvalue += 2;  
-     }
-  }
-}
-
-void mousePressed() {
+void mousePressed() { 
+  
   if (hasLost == true) {
+    
     hasLost = false;
-    numOfCoronas = 1;
-    println("ooooooke");
+    numOfCoronas = 0;
   } 
 }
 
-//void keyReleased()
-//{
-//  if (key == CODED ) {
-//   if(keyCode == UP) maBalle.y = 0;
-//   if(keyCode == LEFT) maBalle.x = 0;
-//   if(keyCode == RIGHT) maBalle.x = 0;
-//   if(keyCode == DOWN) maBalle.y = 0;
-//  }
-    
-//}
-
-
 //_______________________________________________________________________________________________FUNCTIONS____________________________________________________________________________________________________________//
-
 
 void initCoronas(){
   
@@ -140,14 +121,18 @@ void initCoronas(){
        int size = int(random(7, 25));
        
        if (x <= 400) {
+         
          x = 1 + size;
        } else {
+         
          x = 799 - size;
        }
        
        if (y <= 400) {
+         
          y = 1 + size;
        } else {
+         
          y = 799 - size;
        }
        
@@ -155,22 +140,29 @@ void initCoronas(){
     } 
 }
 
-
 /////////////////////////////////////////////
 
-
-void moveCoronas() {   
-    for (int i =0 ; i < numOfCoronas ; i++) {
-        coronas[i].move();
-        coronas[i].testOOB();
-        coronas[i].display();
+void moveCoronas() {
+    
+    for (int i =0 ; i<numOfCoronas ; i++) {
+      
+        if(coronas[i].isDead == false) {
+        
+          coronas[i].move();
+          coronas[i].testOOB();
+          coronas[i].display();
+        } else {
+          
+          coronas[i].x = 1600;
+          coronas[i].y = 1600;
+        }
     } 
 }
-
 
 /////////////////////////////////////////////
 
 void initViruses() {
+  
   viruses = new Virus[10];
   
   int SpawnPoint = int(random(1, 5));
@@ -219,13 +211,16 @@ void initViruses() {
 /////////////////////////////////////////////
 
 void moveViruses() {
+  
     if (viruses == null) return;
     for (int i = 0; i < viruses.length; i++) {
+      
       viruses[i].move(xdirection, ydirection);
       viruses[i].display();
     }   
     
     if (viruses[viruses.length - 1].testOOB()) {
+      
       initViruses();
     }
 }
@@ -233,12 +228,16 @@ void moveViruses() {
 /////////////////////////////////////////////
 
 void play() {
+  
   time = millis()/1000 - timeOfGame;
     
   background(background);
   image(fond, 0, 0);
   
-  myGlobule.move();
+  rect(600, 50, 150, 20, 3);
+  
+  testAttack();
+  //myGlobule.move();
   myGlobule.testOOB();
   myGlobule.display();
 
@@ -246,27 +245,32 @@ void play() {
   moveViruses();
   
   if (testCollisionCoronas()) {
+    
     hasLost = true;
   }
   
   if(viruses != null) {
+    
     if (testCollisionViruses()) {
+      
       hasLost = true;
     }
   }
   
   if (millis() > last + 5000) {
+    
       last = millis();
       if (numOfCoronas < 30) {
+        
         numOfCoronas++;
       }
       
-      if (numOfCoronas == 5 && viruses == null){
+      if (numOfCoronas == 5 && viruses == null) {
+        
         initViruses();
-      }
-      
+      }  
   }
-  
+ 
   text(time + "s" , 50, 50);
 }
 
@@ -282,10 +286,13 @@ void loseScreen() {
   
   
   if (time < 60) { 
+    
     text("Tu as tenu "+ time +" secondes, quel Mickey...", 400, 400);
   } else if (time < 120) {
+    
     text("Tu as tenu "+ time +" secondes, pas mal pour une baltringue...", 400, 400);
   } else {
+    
     text("Tu as tenu "+ time +" secondes, c'est un peu ridicule quand même...", 400, 400);
   }
   
@@ -294,12 +301,16 @@ void loseScreen() {
 /////////////////////////////////////////////
 
 boolean testCollisionCoronas() {
+  
    intersecting = false;
    for (int i = 0; i < numOfCoronas; i++) {
+     
         if(myGlobule.intersect(coronas[i])) {
+          
             intersecting = true;
             break;
         } else {
+          
             intersecting = false;
         }
    }   
@@ -309,7 +320,6 @@ boolean testCollisionCoronas() {
     } else {
         return false;
     }
-    
 }
 
 //////////////////////////////////////////////
@@ -331,4 +341,62 @@ boolean testCollisionViruses() {
         return false;
     }
     
+}
+
+
+
+/////////////////////////////////////////////
+
+void testAttack()
+{
+  
+  if(millis() > lastAttack + attackCooldown) {
+    
+    lastAttack = millis();
+    canAttack = true; 
+  } 
+
+  if(canAttack == true && isAttacking == true) {
+    
+     canAttack = false;
+     lastAttack = millis();
+     attackInProgress = true;
+  }
+  
+  if(millis() > lastAttack + attackDuration) {
+        
+     attackInProgress = false;
+  }
+  
+  if(millis() < lastAttack + attackDuration && attackInProgress == true) {
+        
+     int timeWhileAttacking = millis() - lastAttack ;
+     int attackWidth = int(map(timeWhileAttacking,0,attackDuration,myGlobule.db,(myAttack.maxRange*2)));
+     if (attackWidth > myAttack.maxRange) {
+       
+       attackWidth = myAttack.maxRange ; 
+     }
+     myAttack.display(attackWidth);
+     myAttack.testDestroyBombs(attackWidth);
+  }
+  
+  if(canAttack == true) {
+    
+    text( "ok" ,750,50);
+  } else { 
+    
+    text("nope", 750, 50);
+  }
+  
+  if(canAttack == false) {
+    
+    int cD = millis() - lastAttack;
+    int cDBarWidth = int(map(cD,0,attackCooldown,0,150));
+    fill(0);
+    rect(600, 50, cDBarWidth, 20, 3);
+  } else {
+    
+    fill(0);
+    rect(600, 50, 150, 20, 3);
+  }
 }

@@ -1,19 +1,19 @@
 class Globule {
-  int x, y, r;
+  int x, y, r, db;
   int xvalue, yvalue;
-  color gcolor;
-  int db = 20;
+  color gColor;
   int vitesse = 5; 
   boolean hasTouchedSomething = false;
   
   
   
   Globule (int newX, int newY, int newRadius, color newColor) {
+    
     x = newX;
     y = newY;
     r = newRadius;
-    gcolor = newColor;
-    
+    db = r*2;
+    gColor = newColor; 
   }
   
   void move() {
@@ -26,22 +26,35 @@ class Globule {
   
   
   void display() {
-    fill(gcolor);
+    fill(gColor);
     ellipse(x, y, db, db);
   }
   
   void testOOB() {
-     if (x > (width - db / 2) || x < 0) {
-       x = x - xvalue; 
+    
+     if (x > (width - r )) {
+       
+       x = x - r ;
      }
      
-     if (y > (height - db / 2) || y < 0) {
-       y = y - yvalue; 
+     if (y > ( height - r )) {
+       
+       y =  y - r;
+     }
+     if (x < r) {
+       
+       x = x + r ;
+     }
+     
+     if (y < r){
+       
+       y =  y + r;
      }
   }
   
   
   boolean intersect(Corona c) {
+    
       float distance = dist(x, y, c.x, c.y);
   
       if (distance < r + c.r) 
@@ -55,6 +68,7 @@ class Globule {
   }
   
   boolean intersect(Virus v) {
+    
       float distance = dist(x, y, v.x, v.y);
   
       if (distance < r + v.r) 
