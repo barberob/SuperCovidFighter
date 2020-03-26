@@ -8,7 +8,7 @@ class Attack
     boolean hasTouchedSomething = false;
     int maxRange = 150;
   
-    Attack (int newX, int newY, color newCouleur, PApplet p)
+    Attack (int newX, int newY, color newCouleur)
     {
       x = newX;
       y = newY;

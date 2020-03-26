@@ -238,6 +238,7 @@ void refreshGame() {
     myGlobule.x = width/2;
     myGlobule.y = height/2;
     canAttack = false;
+    viruses = null ; 
 }
 
 void initGlobule() {
