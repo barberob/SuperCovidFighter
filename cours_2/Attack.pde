@@ -20,8 +20,10 @@ class Attack
     void display(int attackWidth) 
     {
       fill(couleur);
+      stroke(#520675);
       ellipseMode(CENTER);
       ellipse(x,y,attackWidth,attackWidth);
+      stroke(0);
      
     }
     

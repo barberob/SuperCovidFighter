@@ -11,6 +11,7 @@ int dB = 20;
 int inc =0;
 boolean hasTouched = false;
 ArrayList<Corona> coronas = new ArrayList<Corona>();
+
 Virus[] viruses;
 Globule myGlobule;
 int last = 0;
@@ -32,15 +33,18 @@ boolean firstAttack = true;
 boolean isAttacking = false;
 boolean attackInProgress = false;
 int attackDuration = 750; //ms
-int attackCooldown = 10000; //ms
+int attackCooldown = 12000; //ms
 int lastAttack = 0;
 int timeOfAttack = 0;
 
-
+int numOfGames= 0;
+PrintWriter output = createWriter("data/scores.txt");;
+BufferedReader input =  createReader("data/scores.txt");
+String score;
 //Minim minim;
 //AudioPlayer musiqueFond;
 
-Attack myAttack = new Attack(250, 250, color(0));
+Attack myAttack = new Attack(250, 250, #8A08B0);
 
 void setup() 
 {
@@ -60,6 +64,8 @@ void setup()
     fond.resize(800,800);
     
     //initCoronas(); 
+    
+
     
 }
 
@@ -81,8 +87,18 @@ void draw()
           play();
           
       } else {
-        
+         numOfGames++;
          loseScreen();
+         //String score = time + " ";
+         //String[] splittedScore = split(score, ' ');
+
+         output.println(time);
+         output.flush(); 
+         output.close();
+         
+
+         //saveStrings("data/scores.txt", splittedScore);
+         
       }
     }
     
@@ -113,8 +129,15 @@ void serialEvent(Serial myPort)
         
         if(inc == 50) {
           
-           lastAttack=millis();
+           lastAttack = millis();
            startMenu = false;
+           timeOfGame = millis();
+           
+        }
+        
+        if(hasLost == true && inc == 51) {
+ 
+            refreshGame();
         }
 
       } else {
@@ -133,22 +156,34 @@ void serialEvent(Serial myPort)
       myAttack.y = myGlobule.y;
       myGlobule.x += newX;
       myGlobule.y += newY;
+      println(inc);
       
     }
 }
 
 //_______________________________________________________________________________________________KEY EVENTS____________________________________________________________________________________________________________//
 
-void mousePressed() { 
+//void mousePressed() { 
   
-  if (hasLost == true) {
+//  if (hasLost == true) {
     
-    hasLost = false;
-    numOfCoronas = 0;
-  } 
-}
+//      hasLost = false;
+//      numOfCoronas = 0;
+//  } 
+//}
 
 //_______________________________________________________________________________________________FUNCTIONS____________________________________________________________________________________________________________//
+
+void refreshGame() {
+  
+    startMenu = true ;
+    hasLost = false;
+    inc = 0;
+    coronas.clear();
+    numOfCoronas = 0;
+    myGlobule.x = width/2;
+    myGlobule.y = height/2;
+}
 
 void initGlobule() {
     
@@ -159,9 +194,6 @@ void initGlobule() {
 
 void initCoronas() {
   
-    //coronas = new Corona[30];
-    //for (int i=0 ; i < 30 ; i++) {
-      
        int x = int(random(0, 800)); 
        int y = int(random(0, 800)); 
        int size = int(random(15, 30));
@@ -187,9 +219,6 @@ void initCoronas() {
       }
       
       println(coronas.size());
-       
-        
-    //} 
 }
 
 /////////////////////////////////////////////
@@ -282,7 +311,7 @@ void moveViruses() {
 void play() {
   
   initCoronas();
-  time = millis()/1000 - timeOfGame;
+  time = millis()/1000 - timeOfGame/1000;
     
   background(background);
   imageMode(CORNER);
@@ -301,6 +330,7 @@ void play() {
   if (testCollisionCoronas()) {
     
     hasLost = true;
+    
   }
   
   if(viruses != null) {
@@ -335,9 +365,10 @@ void play() {
 
 void loseScreen() {
   
-  timeOfGame = millis()/1000;
+  timeOfGame = millis();
+  background(background);
   fill(50);
-  rect(0, 0, 800, 800);
+  
   fill(255);
   textAlign(CENTER, CENTER);
   
