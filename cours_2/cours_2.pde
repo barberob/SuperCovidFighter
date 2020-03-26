@@ -65,7 +65,7 @@ void setup()
 
 void draw() 
 {
-  
+ 
     if (startMenu == true) {
       
         fill(#25F025);
@@ -324,7 +324,8 @@ void play() {
         initViruses();
       }  
   }
- 
+   
+  fill(255);
   text(time + "s" , 50, 50);
   
   displayCoolDown();
