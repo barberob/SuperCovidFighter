@@ -1,8 +1,8 @@
 import processing.serial.*;
-//import ddf.minim.*;
+import ddf.minim.*;
 
 Serial myPort;
-PImage fond, imgCorona, imgGlobule;
+PImage fond, imgCorona, imgGlobule, imgMenu, imgMenuEmpty;
 float xvalue = 0;
 float yvalue = 0;
 int buttonValue;
@@ -36,71 +36,73 @@ int attackDuration = 750; //ms
 int attackCooldown = 12000; //ms
 int lastAttack = 0;
 int timeOfAttack = 0;
-
+PFont font;
 int numOfGames= 0;
 PrintWriter output = createWriter("data/scores.txt");;
 BufferedReader input =  createReader("data/scores.txt");
 String score;
-//Minim minim;
-//AudioPlayer musiqueFond;
+Minim minim;
+AudioPlayer music, attackSound;
 
-Attack myAttack = new Attack(250, 250, #8A08B0);
+Attack myAttack = new Attack(250, 250, #3AF051);
 
 void setup() 
 {
      initGlobule();
-    //minim = new Minim(this);
-    //musiqueFond = minimum.loadFile(".....mp3");
-    f = createFont("Arial",26,true);
-    textFont(f);
+    minim = new Minim(this);
+    music = minim.loadFile("data/main_music.mp3");
+    attackSound = minim.loadFile("data/cell_attack.mp3");
+    music.setGain(-25);
+    
+
+    font = loadFont("CenturyGothic-Bold-30.vlw");
+    textFont(font);
+    
     smooth();
-    size(800, 800);
+    size(1000, 1000);
     myPort = new Serial(this, "COM5", 9600);
     myPort.bufferUntil('\n');
-
     
+    imgMenu = loadImage("data/menu.png");
+    imgMenu.resize(1100,1100);
     fond = loadImage("data/fond.jpg");
- 
-    fond.resize(800,800);
-    
+    fond.resize(1000,1000);
+    imgMenuEmpty = loadImage("data/menu_empty.png");
+    imgMenuEmpty.resize(1100,1100);
     //initCoronas(); 
-    
-
-    
+  
 }
 
 void draw() 
 {
+    
  
     if (startMenu == true) {
       
         fill(#25F025);
         background(background);
         rect(500,500,0,0);
-        textAlign(CENTER);
-        text("Appuyez longuement pour lancer le jeu", width/2, height/2);
+        imageMode(CENTER);
+        image(imgMenu, width/2,height/2);
+        imageMode(CORNER);
+        //text("Appuyez longuement pour lancer le jeu", width/2, height/2);
         
     } else {
       
       if (hasLost == false) {
-        
+          music.play();
           play();
           
       } else {
+         music.pause();
+         music.rewind(); 
          numOfGames++;
          loseScreen();
-         //String score = time + " ";
-         //String[] splittedScore = split(score, ' ');
-
-         output.println(time);
-         output.flush(); 
-         output.close();
-         
-
-         //saveStrings("data/scores.txt", splittedScore);
-         
       }
     }
+    
+    fill(0);
+    
     
     
 }
@@ -143,6 +145,7 @@ void serialEvent(Serial myPort)
       } else {
         
         if(startMenu == true) {
+          
           inc =0 ;
         }
         
@@ -156,7 +159,7 @@ void serialEvent(Serial myPort)
       myAttack.y = myGlobule.y;
       myGlobule.x += newX;
       myGlobule.y += newY;
-      println(inc);
+      //println(inc);
       
     }
 }
@@ -174,6 +177,57 @@ void serialEvent(Serial myPort)
 
 //_______________________________________________________________________________________________FUNCTIONS____________________________________________________________________________________________________________//
 
+
+void play() {
+  
+  initCoronas();
+  time = millis()/1000 - timeOfGame/1000;
+    
+  imageMode(CORNER);
+  image(fond, 0, 0);
+  
+  testAttack();
+  //myGlobule.move();
+  myGlobule.testOOB();
+  myGlobule.display();
+
+  moveCoronas();
+  moveViruses();
+  
+  if (testCollisionCoronas()) {
+    
+    hasLost = true;
+    
+  }
+  
+  if(viruses != null) {
+    
+    if (testCollisionViruses()) {
+      
+      hasLost = true;
+    }
+  }
+  
+  if (millis() > last + 2000) {
+    
+      last = millis();
+      
+        numOfCoronas++;
+     
+      if (numOfCoronas == 5 && viruses == null) {
+        
+        initViruses();
+      }  
+  }
+   
+  fill(255);
+  text(time + "s" , 50, 50);
+  
+  displayCoolDown();
+}
+
+//_________________________________________________________________________________________________________________________________________________________________________
+
 void refreshGame() {
   
     startMenu = true ;
@@ -183,42 +237,43 @@ void refreshGame() {
     numOfCoronas = 0;
     myGlobule.x = width/2;
     myGlobule.y = height/2;
+    canAttack = false;
 }
 
 void initGlobule() {
     
-    myGlobule = new Globule ( 250, 250, 15, color(255));
+    myGlobule = new Globule ( width/2, height/2, 30, color(255));
 }
 
 /////////////////////////////////
 
 void initCoronas() {
   
-       int x = int(random(0, 800)); 
-       int y = int(random(0, 800)); 
-       int size = int(random(15, 30));
+       int x = int(random(0, 1000)); 
+       int y = int(random(0, 1000)); 
+       int size = int(random(25, 50));
        
-       if (x <= 400) {
+       if (x <= 500) {
          
          x = 1 + size;
        } else {
          
-         x = 799 - size;
+         x = 1000 - size;
        }
        
-       if (y <= 400) {
+       if (y <= 500) {
          
          y = 1 + size;
        } else {
          
-         y = 799 - size;
+         y = 1000 - size;
        }
        
       if(numOfCoronas > 0 && numOfCoronas > coronas.size()) {
         coronas.add( new Corona(x, y, size, color(255, 0, 0)));
       }
       
-      println(coronas.size());
+     // println(coronas.size());
 }
 
 /////////////////////////////////////////////
@@ -243,46 +298,47 @@ void moveCoronas() {
 /////////////////////////////////////////////
 
 void initViruses() {
-  
-  viruses = new Virus[10];
+  int totalViruses = 30;
+  viruses = new Virus[totalViruses];
   
   int SpawnPoint = int(random(1, 5));
   
-  int xlocate = -100;
-  int ylocate = -100;
+  int xlocate = -1000;
+  int ylocate = -1000;
   
   xdirection = 0;
   ydirection = 0;
   
   if (SpawnPoint == 1) {
-    ylocate = int(random(0, 800));
+    ylocate = int(random(0, 1000));
     xdirection = 5;
   } else if (SpawnPoint == 2) {
-    xlocate = 800;
-    ylocate = int(random(0, 800));
+    xlocate = 1000;
+    ylocate = int(random(0, 1000));
     xdirection = -5;
   } else if (SpawnPoint == 3) {
-    ylocate = 800;
-    xlocate = int(random(0, 800));
+    ylocate = 1000;
+    xlocate = int(random(0, 1000));
     ydirection = -5;
   } else if (SpawnPoint == 4) {
-    xlocate = int(random(0, 800));
+    xlocate = int(random(0, 1000));
     ydirection = 5;
   }
   
-  for (int i = 0 ; i < 10 ; i++) {
+  for (int i = 0 ; i < totalViruses ; i++) {
     
     int x = 0, y = 0;
     
     if (SpawnPoint == 1 || SpawnPoint == 2) {
-      x =  int(10 * i + random(xlocate, xlocate + 20));
+      
+      x =  int(20 * i + random(xlocate, xlocate + 20));
       y =  ylocate;
     } else if (SpawnPoint == 3 || SpawnPoint == 4) {
       x =  xlocate;
-      y =  int(10 * i + random(ylocate, ylocate + 20));
+      y =  int(20 * i + random(ylocate, ylocate + 20));
     }
     
-     int size = int(random(15, 20));
+     int size = int(random(25, 40));
   
     viruses[i] = new Virus(x, y, size, color(0, 255, 255));
   } 
@@ -300,7 +356,7 @@ void moveViruses() {
       viruses[i].display();
     }   
     
-    if (viruses[viruses.length - 1].testOOB()) {
+    if (viruses[viruses.length - 1].testOOB() && viruses[1].testOOB()) {
       
       initViruses();
     }
@@ -308,82 +364,49 @@ void moveViruses() {
 
 /////////////////////////////////////////////
 
-void play() {
-  
-  initCoronas();
-  time = millis()/1000 - timeOfGame/1000;
-    
-  background(background);
-  imageMode(CORNER);
-  image(fond, 0, 0);
-  
-  
-  
-  testAttack();
-  //myGlobule.move();
-  myGlobule.testOOB();
-  myGlobule.display();
-
-  moveCoronas();
-  moveViruses();
-  
-  if (testCollisionCoronas()) {
-    
-    hasLost = true;
-    
-  }
-  
-  if(viruses != null) {
-    
-    if (testCollisionViruses()) {
-      
-      hasLost = true;
-    }
-  }
-  
-  if (millis() > last + 5000) {
-    
-      last = millis();
-      if (numOfCoronas < 30) {
-        
-        numOfCoronas++;
-      }
-      
-      if (numOfCoronas == 5 && viruses == null) {
-        
-        initViruses();
-      }  
-  }
-   
-  fill(255);
-  text(time + "s" , 50, 50);
-  
-  displayCoolDown();
-}
-
 /////////////////////////////////////////////
 
 void loseScreen() {
   
   timeOfGame = millis();
-  background(background);
-  fill(50);
+  
   
   fill(255);
+  rect(0,0,width,height); 
+  image(imgMenuEmpty,width/2,height/2);
+  
   textAlign(CENTER, CENTER);
   
-  
+
   if (time < 60) { 
     
-    text("Tu as tenu "+ time +" secondes, quel Mickey...", 400, 400);
+    text("Tu as tenu "+ time +" secondes, quel Mickey...", width/2, height/2);
+    
   } else if (time < 120) {
     
-    text("Tu as tenu "+ time +" secondes, pas mal pour une baltringue...", 400, 400);
+    text("Tu as tenu "+ time +" secondes, pas mal pour une baltringue...", width/2, height/2);
   } else {
     
-    text("Tu as tenu "+ time +" secondes, c'est un peu ridicule quand même...", 400, 400);
+    text("Tu as tenu "+ time +" secondes, c'est un peu ridicule quand même...", width/2, height/2);
+    
   }
+  String[] lastScore = loadStrings("data/scores.txt"); 
+       
+   String score = str(time) ;
+   
+   if ( parseInt(lastScore[0]) > parseInt(score) )
+   {
+   } else {
+      fill(255);
+      text("Nouveau record !",150,500);
+      String[] splittedScore = split(score, ' ');
+      saveStrings("data/scores.txt", splittedScore);
+   }
+   
   
+  
+   
+
 }
 
 /////////////////////////////////////////////
@@ -423,6 +446,7 @@ boolean testCollisionViruses() {
           
             intersecting = true;
             break;
+            
         } else {
           
             intersecting = false;
@@ -486,13 +510,13 @@ void displayCoolDown() {
       int cD = millis() - lastAttack;
       int cDBarWidth = int(map(cD,0,attackCooldown,0,150));
       fill(245);
-      rect(600, 50, 150, 20, 3);
+      rect((width/2-75), 50, 150, 20, 3);
       fill(#4858EB);
-      rect(600, 50, cDBarWidth, 20, 3);
+      rect((width/2-75), 50, cDBarWidth, 20, 3);
       
     } else {
       
       fill(#26EB4A);
-      rect(600, 50, 150, 20, 3);
+      rect((width/2-75), 50, 150, 20, 3);
     }
 }

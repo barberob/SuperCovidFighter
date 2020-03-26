@@ -1,31 +1,33 @@
+import ddf.minim.*;
+
 class Attack
 {
     int x,y,r,db;
     int xvalue,yvalue;
     color couleur;
     boolean hasTouchedSomething = false;
-    int maxRange = 100;
-    
+    int maxRange = 150;
   
-    Attack (int newX, int newY, color newCouleur)
+    Attack (int newX, int newY, color newCouleur, PApplet p)
     {
       x = newX;
       y = newY;
       db = maxRange;
       r = db/2;
-      couleur = newCouleur;
-      
+      couleur = newCouleur;  
     }
     
     void display(int attackWidth) 
     {
+      
       fill(couleur);
-      stroke(#520675);
+      noStroke();
       ellipseMode(CENTER);
       ellipse(x,y,attackWidth,attackWidth);
-      stroke(0);
-     
+      stroke(0); 
     }
+    
+   
     
     boolean intersect(int attackWidth ,Corona b) 
     {

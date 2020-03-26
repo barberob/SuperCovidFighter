@@ -28,9 +28,9 @@ class Globule {
   
   
   void display() {
-    fill(#FFFFFF, 0);
+    fill(#FFFFFF,0);
     noStroke();
-    ellipse(x, y, db, db);
+    ellipse(x, y, r, r);
     imageMode(CENTER);
     image(imgGlobule,x,y);
     stroke(0);
@@ -40,21 +40,21 @@ class Globule {
     
      if (x > (width - r )) {
        
-       x = x - r ;
+       x = x - (r/5) ;
      }
      
      if (y > ( height - r )) {
        
-       y =  y - r;
+       y =  y - (r/5);
      }
      if (x < r) {
        
-       x = x + r ;
+       x = x + (r/5) ;
      }
      
      if (y < r){
        
-       y =  y + r;
+       y =  y + (r/5);
      }
   }
   
@@ -63,7 +63,7 @@ class Globule {
     
       float distance = dist(x, y, c.x, c.y);
   
-      if (distance < r + c.r) 
+      if (distance < r) 
       {
         return true;
       }
@@ -77,7 +77,7 @@ class Globule {
     
       float distance = dist(x, y, v.x, v.y);
   
-      if (distance < r + v.r) 
+      if (distance < r ) 
       {
         return true;
       }

@@ -37,10 +37,8 @@ class Corona {
    
     fill(#FFFFFF,0);
     noStroke();
-    ellipse(x, y, db, db);
+    ellipse(x, y, r, r);
     imageMode(CENTER);
-   
-   
     pushMatrix();
     translate(x,y);
     rotate(angle);
