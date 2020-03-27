@@ -8,6 +8,7 @@ class Corona {
     PImage imgCorona;
     float angle = 0.0;
     float angleVelocity = random(-0.1,0.1);
+    
  
  
    Corona(int newX, int newY, int newRadius, color newColor) {
@@ -21,6 +22,9 @@ class Corona {
     ySpeed = int(random(1, 5));
     imgCorona = loadImage("data/corona.png");
     imgCorona.resize(db,db);
+    if (angleVelocity == 0) { 
+        angleVelocity = 0.1;
+    }
     
     
    

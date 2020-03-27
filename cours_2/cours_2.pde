@@ -1,5 +1,11 @@
 import processing.serial.*;
-import ddf.minim.*;
+
+import ddf.minim.*; 
+
+
+
+    
+
 
 Serial myPort;
 PImage fond, imgCorona, imgGlobule, imgMenu, imgMenuEmpty;
@@ -17,7 +23,9 @@ Globule myGlobule;
 int last = 0;
 int n = 0;
 int numOfCoronas = 1;
+int destroyedCoronas = 0;
 int numOfViruses = 0;
+int lastVirusesMove =0;
 
 int xdirection, ydirection;
 int time;
@@ -39,10 +47,11 @@ int timeOfAttack = 0;
 PFont font;
 int numOfGames= 0;
 PrintWriter output = createWriter("data/scores.txt");;
-BufferedReader input =  createReader("data/scores.txt");
+BufferedReader input = createReader("data/scores.txt");
 String score;
 Minim minim;
-AudioPlayer music, attackSound;
+AudioPlayer music, attackSound, pop, spawn;
+
 
 Attack myAttack = new Attack(250, 250, #3AF051);
 
@@ -50,9 +59,15 @@ void setup()
 {
      initGlobule();
     minim = new Minim(this);
+
     music = minim.loadFile("data/main_music.mp3");
-    attackSound = minim.loadFile("data/cell_attack.mp3");
+    attackSound = minim.loadFile("data/attack.wav");
+    pop = minim.loadFile("data/pop.wav");
+    spawn = minim.loadFile("data/spawn.wav");
     music.setGain(-25);
+    attackSound.setGain(-25);
+    pop.setGain(-25);
+    spawn.setGain(-25);
     
 
     font = loadFont("CenturyGothic-Bold-30.vlw");
@@ -66,10 +81,14 @@ void setup()
     imgMenu = loadImage("data/menu.png");
     imgMenu.resize(1100,1100);
     fond = loadImage("data/fond.jpg");
-    fond.resize(1000,1000);
+    fond.resize(1050,1050);
     imgMenuEmpty = loadImage("data/menu_empty.png");
     imgMenuEmpty.resize(1100,1100);
+  
     //initCoronas(); 
+    //initViruses();
+     music.loop();
+
   
 }
 
@@ -78,7 +97,7 @@ void draw()
     
  
     if (startMenu == true) {
-      
+        
         fill(#25F025);
         background(background);
         rect(500,500,0,0);
@@ -90,12 +109,12 @@ void draw()
     } else {
       
       if (hasLost == false) {
-          music.play();
+         
           play();
           
       } else {
-         music.pause();
-         music.rewind(); 
+            
+         
          numOfGames++;
          loseScreen();
       }
@@ -184,7 +203,7 @@ void play() {
   time = millis()/1000 - timeOfGame/1000;
     
   imageMode(CORNER);
-  image(fond, 0, 0);
+  image(fond, -10, -10);
   
   testAttack();
   //myGlobule.move();
@@ -192,6 +211,7 @@ void play() {
   myGlobule.display();
 
   moveCoronas();
+  
   moveViruses();
   
   if (testCollisionCoronas()) {
@@ -206,19 +226,22 @@ void play() {
       
       hasLost = true;
     }
+    
   }
   
-  if (millis() > last + 2000) {
+  if (millis() > last + 3500) {
     
       last = millis();
       
         numOfCoronas++;
      
-      if (numOfCoronas == 5 && viruses == null) {
-        
+      if (numOfCoronas == 5) {
         initViruses();
+        
       }  
   }
+  
+  
    
   fill(255);
   text(time + "s" , 50, 50);
@@ -235,11 +258,15 @@ void refreshGame() {
     inc = 0;
     coronas.clear();
     numOfCoronas = 0;
+    destroyedCoronas = 0;
     myGlobule.x = width/2;
     myGlobule.y = height/2;
     canAttack = false;
     viruses = null ; 
+    music.rewind();
 }
+
+
 
 void initGlobule() {
     
@@ -249,7 +276,9 @@ void initGlobule() {
 /////////////////////////////////
 
 void initCoronas() {
-  
+       
+   if(numOfCoronas > 0 && numOfCoronas > coronas.size()) {
+       
        int x = int(random(0, 1000)); 
        int y = int(random(0, 1000)); 
        int size = int(random(25, 50));
@@ -269,10 +298,11 @@ void initCoronas() {
          
          y = 1000 - size;
        }
-       
-      if(numOfCoronas > 0 && numOfCoronas > coronas.size()) {
+        spawn.rewind();
+        spawn.play();    
         coronas.add( new Corona(x, y, size, color(255, 0, 0)));
-      }
+        
+  }
       
      // println(coronas.size());
 }
@@ -281,7 +311,7 @@ void initCoronas() {
 
 void moveCoronas() {
     
-    for (int i =0 ; i<numOfCoronas ; i++) {
+    for (int i = 0 ; i < numOfCoronas ; i++) {
       
         if(coronas.get(i).isDead == false) {
         
@@ -298,14 +328,61 @@ void moveCoronas() {
 
 /////////////////////////////////////////////
 
+void refreshViruses() {
+    
+    lastVirusesMove = millis();
+    int totalViruses = 20; 
+    
+    int SpawnPoint = int(random(1, 5));
+      
+    int xlocate = -2000;
+    int ylocate = -2000;
+      
+      xdirection = 0;
+      ydirection = 0;
+      
+      if (SpawnPoint == 1) {
+        ylocate = int(random(100, 900));
+        xdirection = 5;
+      } else if (SpawnPoint == 2) {
+        xlocate = 1000;
+        ylocate = int(random(100, 900));
+        xdirection = -5;
+      } else if (SpawnPoint == 3) {
+        ylocate = 1000;
+        xlocate = int(random(100, 900));
+        ydirection = -5;
+      } else if (SpawnPoint == 4) {
+        xlocate = int(random(100, 900));
+        ydirection = 5;
+      }
+      
+      for (int i = 0 ; i < totalViruses ; i++) {
+        
+        int x = 0, y = 0;
+        
+        if (SpawnPoint == 1 || SpawnPoint == 2) {
+          
+          x =  int(40 * i + random(xlocate, xlocate + 20));
+          y =  ylocate;
+        } else if (SpawnPoint == 3 || SpawnPoint == 4) {
+          x =  xlocate;
+          y =  int(40 * i + random(ylocate, ylocate + 20));
+        }
+        viruses[i].x = x;
+        viruses[i].y = y;
+      }
+    
+}
+
 void initViruses() {
-  int totalViruses = 30;
+  int totalViruses = 20;
   viruses = new Virus[totalViruses];
   
   int SpawnPoint = int(random(1, 5));
   
-  int xlocate = -1000;
-  int ylocate = -1000;
+  int xlocate = -2000;
+  int ylocate = -2000;
   
   xdirection = 0;
   ydirection = 0;
@@ -332,11 +409,11 @@ void initViruses() {
     
     if (SpawnPoint == 1 || SpawnPoint == 2) {
       
-      x =  int(20 * i + random(xlocate, xlocate + 20));
+      x =  int(40 * i + random(xlocate, xlocate + 20));
       y =  ylocate;
     } else if (SpawnPoint == 3 || SpawnPoint == 4) {
       x =  xlocate;
-      y =  int(20 * i + random(ylocate, ylocate + 20));
+      y =  int(40 * i + random(ylocate, ylocate + 20));
     }
     
      int size = int(random(25, 40));
@@ -359,7 +436,7 @@ void moveViruses() {
     
     if (viruses[viruses.length - 1].testOOB() && viruses[1].testOOB()) {
       
-      initViruses();
+      refreshViruses();
     }
 }
 
@@ -388,7 +465,7 @@ void loseScreen() {
     text("Tu as tenu "+ time +" secondes, pas mal pour une baltringue...", width/2, height/2);
   } else {
     
-    text("Tu as tenu "+ time +" secondes, c'est un peu ridicule quand même...", width/2, height/2);
+    text("Tu as tenu "+ time +" secondes, mais c'est un peu naze quand même...", width/2, height/2);
     
   }
   String[] lastScore = loadStrings("data/scores.txt"); 
@@ -397,17 +474,17 @@ void loseScreen() {
    
    if ( parseInt(lastScore[0]) > parseInt(score) )
    {
+       
    } else {
       fill(255);
-      text("Nouveau record !",150,500);
+      text("Nouveau record !",width/2, (height/2 - 150));
       String[] splittedScore = split(score, ' ');
       saveStrings("data/scores.txt", splittedScore);
    }
    
-  
-  
+   text("allez, clique ",width/2, (height/2 + 150));
    
-
+   
 }
 
 /////////////////////////////////////////////
@@ -479,14 +556,17 @@ void testAttack()
   
     if(canAttack == true && isAttacking == true) {
       
+       attackSound.rewind();
        canAttack = false;
        lastAttack = millis();
        attackInProgress = true;
+       attackSound.play();
     }
     
     if(millis() > lastAttack + attackDuration) {
           
        attackInProgress = false;
+
     }
     
     if(millis() < lastAttack + attackDuration && attackInProgress == true) {
@@ -499,7 +579,7 @@ void testAttack()
          attackWidth = myAttack.maxRange ; 
        }
        myAttack.display(attackWidth);
-       myAttack.testDestroyBombs(attackWidth);
+       testDestroyCoronas(attackWidth);
     }
 }
 
@@ -520,4 +600,21 @@ void displayCoolDown() {
       fill(#26EB4A);
       rect((width/2-75), 50, 150, 20, 3);
     }
+}
+
+//////////////////////////////////////////////////
+
+void testDestroyCoronas(int attackWidth)
+{
+   for (int i=0 ; i<numOfCoronas ; i++)
+   {
+      if(myAttack.intersect(attackWidth,coronas.get(i)))
+      {
+          pop.rewind();
+          coronas.remove(i);
+          pop.play();
+          numOfCoronas--;
+          
+      } 
+   }    
 }

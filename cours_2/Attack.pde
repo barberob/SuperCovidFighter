@@ -45,16 +45,6 @@ class Attack
         }
     }
     
-    void testDestroyBombs(int attackWidth)
-    {
-       for (int i=0 ; i<numOfCoronas ; i++)
-       {
-          if(myAttack.intersect(attackWidth,coronas.get(i)))
-          {
-              coronas.get(i).isDead =true;
-              coronas.get(i).r = 0;      
-          } 
-       }    
-    }
+    
   
 }

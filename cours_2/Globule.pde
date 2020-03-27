@@ -40,21 +40,21 @@ class Globule {
     
      if (x > (width - r )) {
        
-       x = x - (r/5) ;
+       x = x - (r/3) ;
      }
      
      if (y > ( height - r )) {
        
-       y =  y - (r/5);
+       y =  y - (r/3);
      }
      if (x < r) {
        
-       x = x + (r/5) ;
+       x = x + (r/3) ;
      }
      
      if (y < r){
        
-       y =  y + (r/5);
+       y =  y + (r/3);
      }
   }
   
